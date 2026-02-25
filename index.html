@@ -352,7 +352,20 @@ function buildLayout(size){
 function renderKbSVG(kbIdx){
   const kb=S.keyboards[kbIdx];
   const{keys,totalW,whiteX}=buildLayout(kb.size);
-  const W=totalW+2,H=WH+32; // extra height for zone labels
+  // Pre-calculate label rows to size SVG correctly
+  function calcLabelRows(zones, keys) {
+    const slots=[];
+    function findRow(x1,x2){for(let r=0;r<10;r++){if(!slots.filter(s=>s.row===r&&x1<s.x2+4&&x2>s.x1-4).length)return r;}return 0;}
+    zones.forEach(z=>{
+      const sk=keys.find(k=>k.m===z.start)||keys.reduce((a,b)=>Math.abs(b.m-z.start)<Math.abs(a.m-z.start)?b:a);
+      const ek=keys.find(k=>k.m===z.end)||keys.reduce((a,b)=>Math.abs(b.m-z.end)<Math.abs(a.m-z.end)?b:a);
+      const x1=sk.black?sk.x:sk.x+1;const x2=ek.black?ek.x+ek.w:ek.x+ek.w;
+      const row=findRow(x1,x2);slots.push({x1,x2,row});
+    });
+    return slots.length?Math.max(...slots.map(s=>s.row))+1:1;
+  }
+  const numLabelRows = kb.zones.length ? calcLabelRows(kb.zones, keys) : 1;
+  const W=totalW+2, H=WH+10+numLabelRows*14+4;
   const isActive=kbIdx===S.activeKb;
   let svg=`<svg class="keyboard" viewBox="0 0 ${W} ${H}" width="${W}" height="${H}" xmlns="http://www.w3.org/2000/svg">`;
 
@@ -375,18 +388,29 @@ function renderKbSVG(kbIdx){
     if(sel)svg+=`<rect class="select-overlay" x="${k.x}" y="0" width="${k.w}" height="${k.h}" rx="2" fill="#aaaaff"/>`;
   });
 
-  // Zone labels below keyboard
-  const labelY=WH+8;
+  // Zone labels below keyboard - stacked if overlapping
+  const LABEL_ROW_H = 14;
+  const labelSlots = [];
+  function findLabelRow(x1, x2) {
+    for(let row=0; row<10; row++) {
+      if(!labelSlots.filter(s=>s.row===row && x1 < s.x2+4 && x2 > s.x1-4).length) return row;
+    }
+    return 0;
+  }
+
+  const labelY=WH+6;
   kb.zones.forEach(z=>{
-    // find x positions of start and end keys
     const startKey=keys.find(k=>k.m===z.start)||keys.reduce((a,b)=>Math.abs(b.m-z.start)<Math.abs(a.m-z.start)?b:a);
     const endKey=keys.find(k=>k.m===z.end)||keys.reduce((a,b)=>Math.abs(b.m-z.end)<Math.abs(a.m-z.end)?b:a);
     const x1=startKey.black?startKey.x:startKey.x+1;
     const x2=endKey.black?endKey.x+endKey.w:endKey.x+endKey.w;
-    const cx=(x1+x2)/2;
     const barW=x2-x1;
-    svg+=`<rect x="${x1}" y="${WH+3}" width="${barW}" height="5" rx="2" fill="${z.color}" opacity="0.9"/>`;
-    svg+=`<text x="${cx}" y="${labelY+14}" text-anchor="middle" font-family="sans-serif" font-size="9" font-weight="700" fill="${z.color}">${z.name}</text>`;
+    const cx=(x1+x2)/2;
+    const row = findLabelRow(x1, x2);
+    labelSlots.push({x1, x2, row});
+    const textY = labelY + 8 + row * LABEL_ROW_H;
+    svg+=`<rect x="${x1}" y="${WH+3}" width="${barW}" height="4" rx="2" fill="${z.color}" opacity="0.9"/>`;
+    svg+=`<text x="${cx}" y="${textY}" text-anchor="middle" font-family="sans-serif" font-size="9" font-weight="700" fill="${z.color}">${z.name}</text>`;
   });
 
   svg+=`</svg>`;return svg;
