@@ -169,6 +169,12 @@
         Aktiv: <span id="active-kb-name" style="color:var(--accent)">—</span><br>
         <span style="font-size:9px">(Keyboard anklicken zum Wechseln)</span>
       </div>
+      <div style="margin-top:10px;padding-top:10px;border-top:1px solid var(--border)">
+        <button onclick="saveAsDefault()" style="width:100%;background:transparent;border:1px solid var(--border);color:var(--text-muted);padding:6px;font-size:11px;border-radius:7px;cursor:pointer;transition:all 0.15s" onmouseover="this.style.borderColor='var(--accent)';this.style.color='var(--accent)'" onmouseout="this.style.borderColor='var(--border)';this.style.color='var(--text-muted)'">
+          ⭐ Als Standard speichern
+        </button>
+        <div id="default-hint" style="font-size:9px;color:var(--text-muted);margin-top:5px;text-align:center"></div>
+      </div>
     </div>
     <div class="new-zone-panel" id="new-zone-panel">
       <div class="sidebar-label" style="margin-bottom:0">Neue Zone</div>
@@ -237,7 +243,11 @@ function loadFromDisk(){try{const r=localStorage.getItem(STORAGE_KEY);if(r)songs
 // ---- SONG MANAGEMENT ----
 function newSong(){
   const id=Date.now();
-  songs.push({id,name:`Song ${songs.length+1}`,keyboards:[{size:88,name:'Keyboard 1',zones:[]}]});
+  const defaultSetup = loadDefaultSetup();
+  const keyboards = defaultSetup
+    ? defaultSetup.map(kb=>({size:kb.size, name:kb.name, zones:[]}))
+    : [{size:88,name:'Keyboard 1',zones:[]}];
+  songs.push({id,name:`Song ${songs.length+1}`,keyboards});
   saveToDisk();loadSong(id);renderSongList();
   setTimeout(()=>startRenameSong(id),50);
 }
@@ -545,7 +555,32 @@ function finishRenameKb(i){
   renderAllKeyboards();renderZonesList();
 }
 
-// ---- DIRTY ----
+// ---- DEFAULT SETUP ----
+const DEFAULT_KEY = 'keysplit_default_setup_v1';
+
+function saveAsDefault(){
+  const setup = S.keyboards.map(kb=>({size:kb.size, name:kb.name}));
+  localStorage.setItem(DEFAULT_KEY, JSON.stringify(setup));
+  const hint = document.getElementById('default-hint');
+  hint.style.color = 'var(--accent)';
+  hint.textContent = `✓ Standard: ${setup.map(k=>k.name).join(', ')}`;
+  setTimeout(()=>{ hint.style.color='var(--text-muted)'; },2000);
+}
+
+function loadDefaultSetup(){
+  try {
+    const raw = localStorage.getItem(DEFAULT_KEY);
+    if(raw) return JSON.parse(raw);
+  } catch(e){}
+  return null;
+}
+
+function updateDefaultHint(){
+  const setup = loadDefaultSetup();
+  const hint = document.getElementById('default-hint');
+  if(setup) hint.textContent = `Standard: ${setup.map(k=>k.name).join(', ')}`;
+  else hint.textContent = 'Kein Standard gesetzt';
+}
 function markDirty(){
   S.dirty=true;
   const btn=document.getElementById('btn-save');
@@ -710,6 +745,7 @@ renderSongList();
 renderAllKeyboards();
 renderZonesList();
 setStatus('Bereit','Song auswählen oder anlegen');
+updateDefaultHint();
 
 window.addEventListener('visibilitychange',()=>{if(document.hidden&&activeSongId!==null)flushToActiveSong();});
 window.addEventListener('beforeunload',()=>{if(activeSongId!==null)flushToActiveSong();});
