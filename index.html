@@ -268,6 +268,8 @@ let S={
   keyboards:[{size:88,name:'Keyboard 1',zones:[]}],
   mode:'idle',selStart:null,selEnd:null,
   editingZoneId:null,
+  // Handle drag state
+  draggingHandle:null, // {kbIdx, zoneId, side:'start'|'end'}
   pendingColor:COLORS[0],dragging:false,dirty:false
 };
 
@@ -438,6 +440,12 @@ function renderKbSVG(kbIdx){
     svg+=`<rect class="white-key" data-m="${k.m}" x="${k.x+1}" y="1" width="${k.w-1}" height="${k.h}" rx="2"/>`;
     if(zc)svg+=`<rect class="zone-overlay" x="${k.x+1}" y="1" width="${k.w-1}" height="${k.h}" rx="2" fill="${zc}"/>`;
     if(sel)svg+=`<rect class="select-overlay" x="${k.x+1}" y="1" width="${k.w-1}" height="${k.h}" rx="2" fill="#ffffff"/>`;
+    // C note label
+    if(k.m%12===0){
+      const octave=Math.floor(k.m/12)-1;
+      const labelColor = zc ? 'rgba(0,0,0,0.45)' : '#aaaabc';
+      svg+=`<text x="${k.x+k.w/2}" y="${k.h-3}" text-anchor="middle" font-family="sans-serif" font-size="10" font-weight="700" fill="${labelColor}" pointer-events="none">C${octave}</text>`;
+    }
   });
   blacks.forEach(k=>{
     const zc=zoneColor(k.m),sel=inSel(k.m);
@@ -491,6 +499,25 @@ function renderKbSVG(kbIdx){
     svg+=`<text x="${cx}" y="${textY}" text-anchor="middle" font-family="sans-serif" font-size="9" font-weight="700" fill="${z.color}">${z.name}</text>`;
   });
 
+  // Draw handles on zone edges (only when not in selecting mode)
+  if(S.mode==='idle' || S.mode==='handle'){
+    kb.zones.forEach(z=>{
+      const {x1,x2} = getZoneX(z);
+      const HW=10, HH=14; // handle width/height
+      const hy = WH-HH; // sits at bottom of keyboard
+      // Left handle
+      svg+=`<rect class="zone-handle" data-kbidx="${kbIdx}" data-zoneid="${z.id}" data-side="start"
+        x="${x1}" y="${hy}" width="${HW}" height="${HH}" rx="3"
+        fill="${z.color}" opacity="0.85" style="cursor:ew-resize"/>`;
+      svg+=`<text x="${x1+HW/2}" y="${hy+HH-3}" text-anchor="middle" font-family="sans-serif" font-size="8" fill="white" pointer-events="none">◀</text>`;
+      // Right handle
+      svg+=`<rect class="zone-handle" data-kbidx="${kbIdx}" data-zoneid="${z.id}" data-side="end"
+        x="${x2-HW}" y="${hy}" width="${HW}" height="${HH}" rx="3"
+        fill="${z.color}" opacity="0.85" style="cursor:ew-resize"/>`;
+      svg+=`<text x="${x2-HW/2}" y="${hy+HH-3}" text-anchor="middle" font-family="sans-serif" font-size="8" fill="white" pointer-events="none">▶</text>`;
+    });
+  }
+
   svg+=`</svg>`;return svg;
 }
 
@@ -531,20 +558,49 @@ function bindEvents(){
 }
 function midiFrom(el){const m=el&&el.dataset&&el.dataset.m;return m!==undefined?parseInt(m):null;}
 function midiFromTouch(e){const t=e.touches[0]||e.changedTouches[0];const el=document.elementFromPoint(t.clientX,t.clientY);return midiFrom(el);}
+
+function handleFrom(el){
+  if(!el||!el.classList||!el.classList.contains('zone-handle'))return null;
+  return{kbIdx:parseInt(el.dataset.kbidx),zoneId:parseInt(el.dataset.zoneid),side:el.dataset.side};
+}
+function handleFromTouch(e){
+  const t=e.touches[0]||e.changedTouches[0];
+  return handleFrom(document.elementFromPoint(t.clientX,t.clientY));
+}
+
 function evDown(e){
-  const m=midiFrom(e.target);if(m===null)return;
-  if(S.mode==='idle'&&activeSongId!==null){
-    // find which kb was clicked
-    const kbEl=e.target.closest('.keyboard-block');
-    if(kbEl){const idx=parseInt(kbEl.id.replace('kb-block-',''));if(!isNaN(idx))setActiveKb(idx);}
-    startZoneSelection();
+  // Check for handle first
+  const h=handleFrom(e.target);
+  if(h){
+    S.draggingHandle=h;S.mode='handle';
+    e.stopPropagation();return;
   }
   if(S.mode!=='selecting')return;
+  const m=midiFrom(e.target);if(m===null)return;
   S.dragging=true;S.selStart=m;S.selEnd=m;updateRangeBadge();refreshKb(S.activeKb);
 }
-function evMove(e){if(S.mode!=='selecting'||!S.dragging)return;const m=midiFrom(e.target);if(m===null)return;S.selEnd=m;updateRangeBadge();refreshKb(S.activeKb);}
-function evUp(e){if(S.mode!=='selecting')return;S.dragging=false;const m=midiFrom(e.target);if(m!==null){S.selEnd=m;updateRangeBadge();refreshKb(S.activeKb);}}
+function evMove(e){
+  if(S.mode==='handle'&&S.draggingHandle){
+    const m=midiFrom(e.target);if(m===null)return;
+    applyHandleDrag(m);return;
+  }
+  if(S.mode!=='selecting'||!S.dragging)return;
+  const m=midiFrom(e.target);if(m===null)return;
+  S.selEnd=m;updateRangeBadge();refreshKb(S.activeKb);
+}
+function evUp(e){
+  if(S.mode==='handle'){
+    const m=midiFrom(e.target);
+    if(m!==null)applyHandleDrag(m);
+    commitHandleDrag();return;
+  }
+  if(S.mode!=='selecting')return;
+  S.dragging=false;const m=midiFrom(e.target);
+  if(m!==null){S.selEnd=m;updateRangeBadge();refreshKb(S.activeKb);}
+}
 function evTouchStart(e){
+  const h=handleFromTouch(e);
+  if(h){e.preventDefault();S.draggingHandle=h;S.mode='handle';return;}
   const m=midiFromTouch(e);if(m===null)return;
   if(S.mode==='idle'&&activeSongId!==null){
     const kbEl=e.target.closest('.keyboard-block');
@@ -554,8 +610,44 @@ function evTouchStart(e){
   if(S.mode!=='selecting')return;
   e.preventDefault();S.dragging=true;S.selStart=m;S.selEnd=m;updateRangeBadge();refreshKb(S.activeKb);
 }
-function evTouchMove(e){if(S.mode!=='selecting'||!S.dragging)return;e.preventDefault();const m=midiFromTouch(e);if(m!==null){S.selEnd=m;updateRangeBadge();refreshKb(S.activeKb);}}
-function evTouchEnd(e){if(S.mode!=='selecting')return;S.dragging=false;const m=midiFromTouch(e);if(m!==null){S.selEnd=m;updateRangeBadge();refreshKb(S.activeKb);}}
+function evTouchMove(e){
+  if(S.mode==='handle'&&S.draggingHandle){
+    e.preventDefault();const m=midiFromTouch(e);if(m!==null)applyHandleDrag(m);return;
+  }
+  if(S.mode!=='selecting'||!S.dragging)return;
+  e.preventDefault();const m=midiFromTouch(e);if(m!==null){S.selEnd=m;updateRangeBadge();refreshKb(S.activeKb);}
+}
+function evTouchEnd(e){
+  if(S.mode==='handle'){
+    const m=midiFromTouch(e);if(m!==null)applyHandleDrag(m);
+    commitHandleDrag();return;
+  }
+  if(S.mode!=='selecting')return;
+  S.dragging=false;const m=midiFromTouch(e);
+  if(m!==null){S.selEnd=m;updateRangeBadge();refreshKb(S.activeKb);}
+}
+
+function applyHandleDrag(m){
+  const{kbIdx,zoneId,side}=S.draggingHandle;
+  const zone=S.keyboards[kbIdx].zones.find(z=>z.id===zoneId);
+  if(!zone)return;
+  if(side==='start'){
+    // Don't let start pass end
+    zone.start=Math.min(m, zone.end-1);
+  } else {
+    // Don't let end pass start
+    zone.end=Math.max(m, zone.start+1);
+  }
+  refreshKb(kbIdx);
+}
+function commitHandleDrag(){
+  if(S.draggingHandle){
+    const{kbIdx}=S.draggingHandle;
+    S.draggingHandle=null;S.mode='idle';
+    markDirty();renderZonesList();refreshKb(kbIdx);
+    setStatus('✓ Zone angepasst','Vergiss nicht zu speichern!');
+  }
+}
 
 // ---- ZONE FLOW ----
 function startZoneSelection(){
@@ -924,6 +1016,13 @@ function exportPNG(){
       roundRect(ctx,x0+k.x+1,kbY+1,k.w-1,k.h,2,true,true);
       const zc=zoneColor(k.m);
       if(zc){ctx.globalAlpha=0.5;ctx.fillStyle=zc;roundRect(ctx,x0+k.x+1,kbY+1,k.w-1,k.h,2,true,false);ctx.globalAlpha=1;}
+      // C label
+      if(k.m%12===0){
+        const octave=Math.floor(k.m/12)-1;
+        ctx.fillStyle=zc?'rgba(0,0,0,0.4)':'#aaaabc';
+        ctx.font='bold 10px sans-serif';ctx.textAlign='center';
+        ctx.fillText(`C${octave}`, x0+k.x+k.w/2, kbY+k.h-3);
+      }
     });
     // Black keys
     blacks.forEach(k=>{
