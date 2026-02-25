@@ -541,9 +541,10 @@ function exportPNG(){
 
   // Build export canvas manually
   const SCALE=2;
-  const PAD=20;
-  const KB_GAP=20;
-  const TITLE_H=36;
+  const PAD=24;
+  const KB_GAP=28;
+  const TITLE_H=50;
+  const LABEL_H=18; // space above each keyboard for its name
 
   // Calculate total size
   let maxKbW=0;
@@ -552,7 +553,7 @@ function exportPNG(){
     if(totalW>maxKbW)maxKbW=totalW;
     return totalW;
   });
-  const totalH=TITLE_H + PAD + kbs.length*(WH+32+KB_GAP) + PAD;
+  const totalH=TITLE_H + PAD + kbs.length*(LABEL_H+WH+32+KB_GAP) + PAD;
   const totalW=maxKbW + PAD*2;
 
   const canvas=document.getElementById('export-canvas');
@@ -567,12 +568,12 @@ function exportPNG(){
 
   // Title
   ctx.fillStyle='#f0f0f5';
-  ctx.font='bold 18px Syne, sans-serif';
+  ctx.font='bold 20px Syne, sans-serif';
   ctx.textAlign='left';
-  ctx.fillText(song.name,PAD,PAD+16);
+  ctx.fillText(song.name, PAD, PAD+18);
   ctx.fillStyle='#6b6b85';
   ctx.font='11px Space Mono, monospace';
-  ctx.fillText(`KeySplit — ${kbs.length} Keyboard(s)`,PAD,PAD+30);
+  ctx.fillText(`KeySplit  ·  ${kbs.length} Keyboard(s)`, PAD, PAD+36);
 
   let y=TITLE_H+PAD;
 
@@ -581,27 +582,29 @@ function exportPNG(){
     const whites=keys.filter(k=>!k.black),blacks=keys.filter(k=>k.black);
     const x0=PAD;
 
-    // KB label
-    ctx.fillStyle='#6b6b85';
-    ctx.font='bold 10px Syne, sans-serif';
+    // KB label above keyboard
+    ctx.fillStyle='#9999bb';
+    ctx.font='bold 11px Syne, sans-serif';
     ctx.textAlign='left';
-    ctx.fillText(kb.name.toUpperCase(),x0,y-4);
+    ctx.fillText(kb.name, x0, y+13);
+
+    const kbY = y + LABEL_H; // keyboard starts below label
 
     function zoneColor(m){let c=null;kb.zones.forEach(z=>{if(m>=z.start&&m<=z.end)c=z.color;});return c;}
 
     // White keys
     whites.forEach(k=>{
       ctx.fillStyle='#e8e8f0';ctx.strokeStyle='#aaaabc';ctx.lineWidth=1;
-      roundRect(ctx,x0+k.x+1,y+1,k.w-1,k.h,2,true,true);
+      roundRect(ctx,x0+k.x+1,kbY+1,k.w-1,k.h,2,true,true);
       const zc=zoneColor(k.m);
-      if(zc){ctx.globalAlpha=0.5;ctx.fillStyle=zc;roundRect(ctx,x0+k.x+1,y+1,k.w-1,k.h,2,true,false);ctx.globalAlpha=1;}
+      if(zc){ctx.globalAlpha=0.5;ctx.fillStyle=zc;roundRect(ctx,x0+k.x+1,kbY+1,k.w-1,k.h,2,true,false);ctx.globalAlpha=1;}
     });
     // Black keys
     blacks.forEach(k=>{
       ctx.fillStyle='#1c1c28';ctx.strokeStyle='#0a0a14';ctx.lineWidth=0.5;
-      roundRect(ctx,x0+k.x,y,k.w,k.h,2,true,true);
+      roundRect(ctx,x0+k.x,kbY,k.w,k.h,2,true,true);
       const zc=zoneColor(k.m);
-      if(zc){ctx.globalAlpha=0.5;ctx.fillStyle=zc;roundRect(ctx,x0+k.x,y,k.w,k.h,2,true,false);ctx.globalAlpha=1;}
+      if(zc){ctx.globalAlpha=0.5;ctx.fillStyle=zc;roundRect(ctx,x0+k.x,kbY,k.w,k.h,2,true,false);ctx.globalAlpha=1;}
     });
 
     // Zone labels
@@ -612,16 +615,14 @@ function exportPNG(){
       const x2=x0+(endKey.black?endKey.x+endKey.w:endKey.x+endKey.w);
       const barW=x2-x1;
       const cx=(x1+x2)/2;
-      // Color bar
       ctx.fillStyle=z.color;ctx.globalAlpha=0.9;
-      roundRect(ctx,x1,y+WH+3,barW,5,2,true,false);ctx.globalAlpha=1;
-      // Label
+      roundRect(ctx,x1,kbY+WH+3,barW,5,2,true,false);ctx.globalAlpha=1;
       ctx.fillStyle=z.color;
       ctx.font='bold 9px sans-serif';ctx.textAlign='center';
-      ctx.fillText(z.name,cx,y+WH+22);
+      ctx.fillText(z.name,cx,kbY+WH+22);
     });
 
-    y+=WH+32+KB_GAP;
+    y+=LABEL_H+WH+32+KB_GAP;
   });
 
   document.getElementById('export-overlay').classList.add('open');
