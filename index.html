@@ -546,14 +546,31 @@ function exportPNG(){
   const TITLE_H=50;
   const LABEL_H=18; // space above each keyboard for its name
 
-  // Calculate total size
+  // Calculate total size - account for stacked labels
   let maxKbW=0;
   const kbLayouts=kbs.map(kb=>{
     const{totalW}=buildLayout(kb.size);
     if(totalW>maxKbW)maxKbW=totalW;
     return totalW;
   });
-  const totalH=TITLE_H + PAD + kbs.length*(LABEL_H+WH+32+KB_GAP) + PAD;
+
+  // Pre-calculate max label rows per keyboard
+  function calcMaxRows(kb) {
+    const{keys}=buildLayout(kb.size);
+    const slots=[];
+    function findRow(x1,x2){for(let r=0;r<10;r++){if(!slots.filter(s=>s.row===r&&x1<s.x2+4&&x2>s.x1-4).length)return r;}return 0;}
+    kb.zones.forEach(z=>{
+      const sk=keys.find(k=>k.m===z.start)||keys.reduce((a,b)=>Math.abs(b.m-z.start)<Math.abs(a.m-z.start)?b:a);
+      const ek=keys.find(k=>k.m===z.end)||keys.reduce((a,b)=>Math.abs(b.m-z.end)<Math.abs(a.m-z.end)?b:a);
+      const x1=sk.black?sk.x:sk.x+1;const x2=ek.black?ek.x+ek.w:ek.x+ek.w;
+      const row=findRow(x1,x2);slots.push({x1,x2,row});
+    });
+    return slots.length?Math.max(...slots.map(s=>s.row))+1:1;
+  }
+
+  const LABEL_ROW_H=16;
+  const labelRowsPerKb=kbs.map(kb=>calcMaxRows(kb));
+  const totalH=TITLE_H + PAD + kbs.reduce((sum,kb,i)=>sum+LABEL_H+WH+8+labelRowsPerKb[i]*LABEL_ROW_H+KB_GAP,0) + PAD;
   const totalW=maxKbW + PAD*2;
 
   const canvas=document.getElementById('export-canvas');
@@ -607,7 +624,18 @@ function exportPNG(){
       if(zc){ctx.globalAlpha=0.5;ctx.fillStyle=zc;roundRect(ctx,x0+k.x,kbY,k.w,k.h,2,true,false);ctx.globalAlpha=1;}
     });
 
-    // Zone labels
+    // Zone labels - stack vertically if overlapping
+    const LABEL_ROW_H = 16;
+    const labelSlots = []; // [{x1, x2, row}]
+
+    function findRow(x1, x2) {
+      for(let row=0; row<10; row++) {
+        const conflicts = labelSlots.filter(s => s.row===row && x1 < s.x2+4 && x2 > s.x1-4);
+        if(!conflicts.length) return row;
+      }
+      return 0;
+    }
+
     kb.zones.forEach(z=>{
       const startKey=keys.find(k=>k.m===z.start)||keys.reduce((a,b)=>Math.abs(b.m-z.start)<Math.abs(a.m-z.start)?b:a);
       const endKey=keys.find(k=>k.m===z.end)||keys.reduce((a,b)=>Math.abs(b.m-z.end)<Math.abs(a.m-z.end)?b:a);
@@ -615,14 +643,17 @@ function exportPNG(){
       const x2=x0+(endKey.black?endKey.x+endKey.w:endKey.x+endKey.w);
       const barW=x2-x1;
       const cx=(x1+x2)/2;
+      const row = findRow(x1, x2);
+      labelSlots.push({x1, x2, row});
+
       ctx.fillStyle=z.color;ctx.globalAlpha=0.9;
       roundRect(ctx,x1,kbY+WH+3,barW,5,2,true,false);ctx.globalAlpha=1;
       ctx.fillStyle=z.color;
       ctx.font='bold 9px sans-serif';ctx.textAlign='center';
-      ctx.fillText(z.name,cx,kbY+WH+22);
+      ctx.fillText(z.name, cx, kbY+WH+16 + row*LABEL_ROW_H);
     });
 
-    y+=LABEL_H+WH+32+KB_GAP;
+    y+=LABEL_H+WH+8+labelRowsPerKb[ki]*LABEL_ROW_H+KB_GAP;
   });
 
   document.getElementById('export-overlay').classList.add('open');
