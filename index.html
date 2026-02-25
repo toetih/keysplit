@@ -107,11 +107,36 @@
   .kb-count-btn:hover{border-color:var(--accent);color:var(--accent);}
   .kb-count-display{font-size:12px;font-weight:700;min-width:14px;text-align:center;font-family:'Space Mono',monospace;}
   .rename-input{background:var(--surface2);border:1px solid var(--accent);border-radius:6px;color:var(--text);font-family:'Syne',sans-serif;font-size:12px;font-weight:700;padding:2px 7px;outline:none;letter-spacing:0.5px;width:140px;}
+
+  /* KB zone groups in sidebar */
+  .kb-zone-group{
+    border:1px solid var(--border);border-radius:10px;
+    margin-bottom:10px;overflow:hidden;
+    transition:border-color 0.15s;cursor:pointer;
+  }
+  .kb-zone-group.active-group{border-color:var(--accent);}
+  .kb-zone-group-header{
+    display:flex;align-items:center;justify-content:space-between;
+    padding:8px 10px;background:var(--surface2);
+    font-size:11px;font-weight:700;letter-spacing:0.5px;
+  }
+  .kb-zone-group.active-group .kb-zone-group-header{color:var(--accent);}
+  .kb-zone-group-body{padding:6px 8px 8px;}
+  .kb-zone-group-empty{font-size:11px;color:var(--text-muted);padding:4px 2px;}
   ::-webkit-scrollbar{width:5px;height:5px;}
   ::-webkit-scrollbar-track{background:transparent;}
   ::-webkit-scrollbar-thumb{background:var(--border);border-radius:3px;}
 
-  /* EXPORT PREVIEW OVERLAY */
+  /* COLOR POPUP */
+  #color-popup{
+    display:none;position:fixed;z-index:300;
+    background:var(--surface);border:1px solid var(--accent);
+    border-radius:12px;padding:14px;
+    box-shadow:0 8px 32px rgba(0,0,0,0.6);
+    bottom:80px;left:260px;
+    min-width:200px;
+  }
+  #color-popup.open{display:block;}
   #export-overlay{
     display:none;position:fixed;inset:0;background:rgba(0,0,0,0.85);
     z-index:200;align-items:center;justify-content:center;flex-direction:column;gap:16px;
@@ -137,6 +162,10 @@
     <div class="song-sidebar-header">
       <div class="sidebar-label" style="margin-bottom:0">Songs</div>
       <button class="btn-primary" style="width:100%;font-size:12px;padding:7px" onclick="newSong()">+ Neuer Song</button>
+      <div style="display:flex;gap:6px">
+        <button onclick="exportSongs()" style="flex:1;background:transparent;border:1px solid var(--border);color:var(--text-muted);padding:5px;font-size:10px;border-radius:7px;cursor:pointer;font-family:'Syne',sans-serif;font-weight:600;transition:all 0.15s" onmouseover="this.style.borderColor='var(--green)';this.style.color='var(--green)'" onmouseout="this.style.borderColor='var(--border)';this.style.color='var(--text-muted)'">⬇ Export</button>
+        <button onclick="importSongs()" style="flex:1;background:transparent;border:1px solid var(--border);color:var(--text-muted);padding:5px;font-size:10px;border-radius:7px;cursor:pointer;font-family:'Syne',sans-serif;font-weight:600;transition:all 0.15s" onmouseover="this.style.borderColor='var(--accent)';this.style.color='var(--accent)'" onmouseout="this.style.borderColor='var(--border)';this.style.color='var(--text-muted)'">⬆ Import</button>
+      </div>
     </div>
     <div class="song-list" id="song-list">
       <div class="empty-hint">Noch keine Songs.</div>
@@ -190,7 +219,7 @@
       </div>
     </div>
     <div style="padding:8px 14px 6px;border-bottom:1px solid var(--border)">
-      <div class="sidebar-label" style="margin-bottom:0">Zonen — <span id="zone-kb-label" style="color:var(--accent)"></span></div>
+      <div class="sidebar-label" style="margin-bottom:0">Zonen</div>
     </div>
     <div class="zones-list" id="zones-list">
       <div class="empty-hint">Noch keine Zonen.</div>
@@ -206,6 +235,9 @@
     <div class="keyboards-container" id="keyboards-container"></div>
   </div>
 </div>
+
+<!-- COLOR POPUP -->
+<input type="file" id="import-file-input" accept=".json" style="display:none" onchange="handleImportFile(event)">
 
 <!-- EXPORT OVERLAY -->
 <div id="export-overlay">
@@ -374,8 +406,21 @@ function renderKbSVG(kbIdx){
     });
     return slots.length?Math.max(...slots.map(s=>s.row))+1:1;
   }
+  // Calculate height dynamically: bars + labels
+  function calcBarRows(zones,keys){
+    const slots=[];
+    function findR(x1,x2){for(let r=0;r<10;r++){if(!slots.filter(s=>s.row===r&&x1<s.x2+2&&x2>s.x1-2).length)return r;}return 0;}
+    zones.forEach(z=>{
+      const sk=keys.find(k=>k.m===z.start)||keys.reduce((a,b)=>Math.abs(b.m-z.start)<Math.abs(a.m-z.start)?b:a);
+      const ek=keys.find(k=>k.m===z.end)||keys.reduce((a,b)=>Math.abs(b.m-z.end)<Math.abs(a.m-z.end)?b:a);
+      const x1=sk.black?sk.x:sk.x+1;const x2=ek.black?ek.x+ek.w:ek.x+ek.w;
+      slots.push({x1,x2,row:findR(x1,x2)});
+    });
+    return slots.length?Math.max(...slots.map(s=>s.row))+1:1;
+  }
   const numLabelRows = kb.zones.length ? calcLabelRows(kb.zones, keys) : 1;
-  const W=totalW+2, H=WH+10+numLabelRows*14+4;
+  const numBarRows = kb.zones.length ? calcBarRows(kb.zones, keys) : 1;
+  const W=totalW+2, H=WH + 3 + numBarRows*6 + 4 + numLabelRows*14 + 6;
   const isActive=kbIdx===S.activeKb;
   let svg=`<svg class="keyboard" viewBox="0 0 ${W} ${H}" width="${W}" height="${H}" xmlns="http://www.w3.org/2000/svg">`;
 
@@ -398,28 +443,48 @@ function renderKbSVG(kbIdx){
     if(sel)svg+=`<rect class="select-overlay" x="${k.x}" y="0" width="${k.w}" height="${k.h}" rx="2" fill="#aaaaff"/>`;
   });
 
-  // Zone labels below keyboard - stacked if overlapping
+  // Zone bars - detect overlaps and render stacked bars
   const LABEL_ROW_H = 14;
-  const labelSlots = [];
-  function findLabelRow(x1, x2) {
-    for(let row=0; row<10; row++) {
-      if(!labelSlots.filter(s=>s.row===row && x1 < s.x2+4 && x2 > s.x1-4).length) return row;
-    }
-    return 0;
+  const BAR_H = 4;
+  const BAR_GAP = 2;
+
+  // For each zone, calculate x positions
+  function getZoneX(z) {
+    const sk=keys.find(k=>k.m===z.start)||keys.reduce((a,b)=>Math.abs(b.m-z.start)<Math.abs(a.m-z.start)?b:a);
+    const ek=keys.find(k=>k.m===z.end)||keys.reduce((a,b)=>Math.abs(b.m-z.end)<Math.abs(a.m-z.end)?b:a);
+    const x1=sk.black?sk.x:sk.x+1;
+    const x2=ek.black?ek.x+ek.w:ek.x+ek.w;
+    return {x1, x2};
   }
 
-  const labelY=WH+6;
-  kb.zones.forEach(z=>{
-    const startKey=keys.find(k=>k.m===z.start)||keys.reduce((a,b)=>Math.abs(b.m-z.start)<Math.abs(a.m-z.start)?b:a);
-    const endKey=keys.find(k=>k.m===z.end)||keys.reduce((a,b)=>Math.abs(b.m-z.end)<Math.abs(a.m-z.end)?b:a);
-    const x1=startKey.black?startKey.x:startKey.x+1;
-    const x2=endKey.black?endKey.x+endKey.w:endKey.x+endKey.w;
-    const barW=x2-x1;
+  // Assign bar rows (for stacking overlapping bars)
+  const barSlots=[];
+  function findBarRow(x1,x2){for(let r=0;r<10;r++){if(!barSlots.filter(s=>s.row===r&&x1<s.x2+2&&x2>s.x1-2).length)return r;}return 0;}
+
+  // Assign label rows (for stacking labels)
+  const labelSlots=[];
+  function findLabelRow(x1,x2){for(let r=0;r<10;r++){if(!labelSlots.filter(s=>s.row===r&&x1<s.x2+4&&x2>s.x1-4).length)return r;}return 0;}
+
+  const zonePositions = kb.zones.map(z=>({z, ...getZoneX(z)}));
+
+  // Draw bars
+  zonePositions.forEach(({z,x1,x2})=>{
+    const barRow = findBarRow(x1,x2);
+    barSlots.push({x1,x2,row:barRow});
+    const barY = WH+3 + barRow*(BAR_H+BAR_GAP);
+    svg+=`<rect x="${x1}" y="${barY}" width="${x2-x1}" height="${BAR_H}" rx="2" fill="${z.color}" opacity="0.9"/>`;
+  });
+
+  // Max bar rows needed -> offset labels below all bars
+  const maxBarRows = barSlots.length ? Math.max(...barSlots.map(s=>s.row))+1 : 1;
+  const labelBaseY = WH + 3 + maxBarRows*(BAR_H+BAR_GAP) + 4;
+
+  // Draw labels
+  zonePositions.forEach(({z,x1,x2})=>{
     const cx=(x1+x2)/2;
-    const row = findLabelRow(x1, x2);
-    labelSlots.push({x1, x2, row});
-    const textY = labelY + 8 + row * LABEL_ROW_H;
-    svg+=`<rect x="${x1}" y="${WH+3}" width="${barW}" height="4" rx="2" fill="${z.color}" opacity="0.9"/>`;
+    const labelRow = findLabelRow(x1,x2);
+    labelSlots.push({x1,x2,row:labelRow});
+    const textY = labelBaseY + 9 + labelRow*LABEL_ROW_H;
     svg+=`<text x="${cx}" y="${textY}" text-anchor="middle" font-family="sans-serif" font-size="9" font-weight="700" fill="${z.color}">${z.name}</text>`;
   });
 
@@ -463,10 +528,29 @@ function bindEvents(){
 }
 function midiFrom(el){const m=el&&el.dataset&&el.dataset.m;return m!==undefined?parseInt(m):null;}
 function midiFromTouch(e){const t=e.touches[0]||e.changedTouches[0];const el=document.elementFromPoint(t.clientX,t.clientY);return midiFrom(el);}
-function evDown(e){if(S.mode!=='selecting')return;const m=midiFrom(e.target);if(m===null)return;S.dragging=true;S.selStart=m;S.selEnd=m;updateRangeBadge();refreshKb(S.activeKb);}
+function evDown(e){
+  const m=midiFrom(e.target);if(m===null)return;
+  if(S.mode==='idle'&&activeSongId!==null){
+    // find which kb was clicked
+    const kbEl=e.target.closest('.keyboard-block');
+    if(kbEl){const idx=parseInt(kbEl.id.replace('kb-block-',''));if(!isNaN(idx))setActiveKb(idx);}
+    startZoneSelection();
+  }
+  if(S.mode!=='selecting')return;
+  S.dragging=true;S.selStart=m;S.selEnd=m;updateRangeBadge();refreshKb(S.activeKb);
+}
 function evMove(e){if(S.mode!=='selecting'||!S.dragging)return;const m=midiFrom(e.target);if(m===null)return;S.selEnd=m;updateRangeBadge();refreshKb(S.activeKb);}
 function evUp(e){if(S.mode!=='selecting')return;S.dragging=false;const m=midiFrom(e.target);if(m!==null){S.selEnd=m;updateRangeBadge();refreshKb(S.activeKb);}}
-function evTouchStart(e){if(S.mode!=='selecting')return;e.preventDefault();const m=midiFromTouch(e);if(m===null)return;S.dragging=true;S.selStart=m;S.selEnd=m;updateRangeBadge();refreshKb(S.activeKb);}
+function evTouchStart(e){
+  const m=midiFromTouch(e);if(m===null)return;
+  if(S.mode==='idle'&&activeSongId!==null){
+    const kbEl=e.target.closest('.keyboard-block');
+    if(kbEl){const idx=parseInt(kbEl.id.replace('kb-block-',''));if(!isNaN(idx))setActiveKb(idx);}
+    startZoneSelection();
+  }
+  if(S.mode!=='selecting')return;
+  e.preventDefault();S.dragging=true;S.selStart=m;S.selEnd=m;updateRangeBadge();refreshKb(S.activeKb);
+}
 function evTouchMove(e){if(S.mode!=='selecting'||!S.dragging)return;e.preventDefault();const m=midiFromTouch(e);if(m!==null){S.selEnd=m;updateRangeBadge();refreshKb(S.activeKb);}}
 function evTouchEnd(e){if(S.mode!=='selecting')return;S.dragging=false;const m=midiFromTouch(e);if(m!==null){S.selEnd=m;updateRangeBadge();refreshKb(S.activeKb);}}
 
@@ -500,6 +584,10 @@ function deleteZone(id){
   S.keyboards[S.activeKb].zones=S.keyboards[S.activeKb].zones.filter(z=>z.id!==id);
   markDirty();renderZonesList();refreshKb(S.activeKb);
 }
+function deleteZoneFrom(kbIdx,zoneId){
+  S.keyboards[kbIdx].zones=S.keyboards[kbIdx].zones.filter(z=>z.id!==zoneId);
+  markDirty();renderZonesList();refreshKb(kbIdx);
+}
 function updateRangeBadge(){
   const el=document.getElementById('range-badge');
   if(S.selStart===null){el.textContent='← Tasten auf Tastatur wählen';return;}
@@ -509,18 +597,86 @@ function updateRangeBadge(){
 
 // ---- ZONES LIST ----
 function renderZonesList(){
-  document.getElementById('zone-kb-label').textContent=S.keyboards[S.activeKb]?.name||'';
-  const zones=S.keyboards[S.activeKb]?.zones||[];
   const el=document.getElementById('zones-list');
-  if(!zones.length){el.innerHTML='<div class="empty-hint">Noch keine Zonen.<br>+ Zone klicken.</div>';return;}
-  el.innerHTML=zones.map(z=>`<div class="zone-item"><div class="zone-color-dot" style="background:${z.color}"></div><div class="zone-info"><div class="zone-name">${z.name}</div><div class="zone-range">${noteName(z.start)} – ${noteName(z.end)}</div></div><button class="btn-danger" onclick="deleteZone(${z.id})">✕</button></div>`).join('');
+  if(!S.keyboards.length){el.innerHTML='<div class="empty-hint">Noch keine Keyboards.</div>';return;}
+  el.innerHTML=S.keyboards.map((kb,i)=>{
+    const isActive=i===S.activeKb;
+    const zones=kb.zones||[];
+    const zonesHTML=zones.length
+      ? zones.map(z=>`
+        <div class="zone-item" style="margin-bottom:5px;cursor:pointer" onclick="openZoneEdit(${i},${z.id});event.stopPropagation()" title="Klicken zum Bearbeiten">
+          <div class="zone-color-dot" style="background:${z.color};width:14px;height:14px"></div>
+          <div class="zone-info">
+            <div class="zone-name">${z.name}</div>
+            <div class="zone-range">${noteName(z.start)} – ${noteName(z.end)}</div>
+          </div>
+          <button class="btn-danger" onclick="deleteZoneFrom(${i},${z.id});event.stopPropagation()">✕</button>
+        </div>`).join('')
+      : `<div class="kb-zone-group-empty">Keine Zonen</div>`;
+    return `<div class="kb-zone-group ${isActive?'active-group':''}" onclick="setActiveKb(${i})">
+      <div class="kb-zone-group-header">
+        <span>${kb.name}</span>
+        ${isActive?'<span style="font-size:9px;color:var(--accent);border:1px solid var(--accent);border-radius:3px;padding:1px 5px">AKTIV</span>':''}
+      </div>
+      <div class="kb-zone-group-body">${zonesHTML}</div>
+    </div>`;
+  }).join('');
 }
 
-// ---- COLOR ----
+// ---- COLOR CHANGE ----
 function renderColorPicker(){
   document.getElementById('color-picker').innerHTML=COLORS.map(c=>`<div class="color-swatch ${c===S.pendingColor?'selected':''}" style="background:${c}" onclick="pickColor('${c}')"></div>`).join('');
 }
 function pickColor(c){S.pendingColor=c;renderColorPicker();}
+
+let colorPickerTarget = null; // {kbIdx, zoneId}
+
+function openZoneEdit(kbIdx, zoneId){
+  colorPickerTarget = {kbIdx, zoneId};
+  const zone = S.keyboards[kbIdx].zones.find(z=>z.id===zoneId);
+  if(!zone) return;
+  const popup = document.getElementById('color-popup');
+  popup.innerHTML = `
+    <div style="font-size:10px;font-weight:700;letter-spacing:1px;text-transform:uppercase;color:var(--text-muted);margin-bottom:8px">Zone bearbeiten</div>
+    <input type="text" id="zone-edit-name" value="${zone.name}"
+      style="width:100%;background:var(--surface2);border:1px solid var(--border);border-radius:7px;color:var(--text);font-family:'Syne',sans-serif;font-size:13px;padding:7px 10px;outline:none;margin-bottom:10px;"
+      onfocus="this.style.borderColor='var(--accent)'" onblur="this.style.borderColor='var(--border)'">
+    <div style="font-size:10px;font-weight:700;letter-spacing:1px;text-transform:uppercase;color:var(--text-muted);margin-bottom:7px">Farbe</div>
+    <div style="display:flex;gap:7px;flex-wrap:wrap;margin-bottom:12px">
+      ${COLORS.map(c=>`<div style="width:24px;height:24px;border-radius:50%;cursor:pointer;background:${c};border:2px solid ${c===zone.color?'white':'transparent'};transition:transform 0.1s" onclick="selectEditColor('${c}',this)" onmouseover="this.style.transform='scale(1.15)'" onmouseout="this.style.transform=''"></div>`).join('')}
+    </div>
+    <div style="display:flex;gap:8px">
+      <button class="btn-ghost" style="flex:1;font-size:11px;padding:6px" onclick="closeColorPopup()">Abbrechen</button>
+      <button class="btn-success" style="flex:1;font-size:11px;padding:6px" onclick="saveZoneEdit()">Speichern</button>
+    </div>
+  `;
+  popup.classList.add('open');
+}
+
+function selectEditColor(color, el){
+  // visually select
+  document.querySelectorAll('#color-popup div[style*="border-radius:50%"]').forEach(d=>d.style.borderColor='transparent');
+  el.style.borderColor='white';
+  colorPickerTarget.pendingColor = color;
+}
+
+function saveZoneEdit(){
+  if(!colorPickerTarget) return;
+  const {kbIdx, zoneId} = colorPickerTarget;
+  const zone = S.keyboards[kbIdx].zones.find(z=>z.id===zoneId);
+  if(zone){
+    const nameInput = document.getElementById('zone-edit-name');
+    if(nameInput && nameInput.value.trim()) zone.name = nameInput.value.trim();
+    if(colorPickerTarget.pendingColor) zone.color = colorPickerTarget.pendingColor;
+    markDirty(); renderZonesList(); refreshKb(kbIdx);
+  }
+  closeColorPopup();
+}
+}
+function closeColorPopup(){
+  document.getElementById('color-popup').classList.remove('open');
+  colorPickerTarget = null;
+}
 
 // ---- KB COUNT / ACTIVE ----
 function changeKbCount(d){
@@ -553,6 +709,52 @@ function finishRenameKb(i){
   const inp=document.getElementById(`kb-rename-${i}`);if(!inp)return;
   if(!inp.dataset.cancel){S.keyboards[i].name=inp.value.trim()||S.keyboards[i].name;markDirty();}
   renderAllKeyboards();renderZonesList();
+}
+
+// ---- EXPORT / IMPORT SONGS ----
+function exportSongs(){
+  if(!songs.length){setStatus('⚠ Keine Songs zum Exportieren','');return;}
+  if(activeSongId!==null) flushToActiveSong();
+  const data = JSON.stringify({version:1, songs}, null, 2);
+  const blob = new Blob([data], {type:'application/json'});
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(blob);
+  const date = new Date().toISOString().slice(0,10);
+  a.download = `keysplit_backup_${date}.json`;
+  a.click();
+  setStatus('✓ Songs exportiert','JSON-Datei gespeichert');
+}
+
+function importSongs(){
+  document.getElementById('import-file-input').value='';
+  document.getElementById('import-file-input').click();
+}
+
+function handleImportFile(e){
+  const file = e.target.files[0];
+  if(!file) return;
+  const reader = new FileReader();
+  reader.onload = evt => {
+    try {
+      const data = JSON.parse(evt.target.result);
+      const imported = data.songs || (Array.isArray(data) ? data : null);
+      if(!imported) throw new Error('Ungültiges Format');
+      const count = imported.length;
+      if(!confirm(`${count} Song(s) importieren?\n\nBestehende Songs bleiben erhalten – importierte Songs werden hinzugefügt.`)) return;
+      // Merge: add imported songs, avoid id conflicts
+      const existingIds = new Set(songs.map(s=>s.id));
+      imported.forEach(s => {
+        if(existingIds.has(s.id)) s.id = Date.now() + Math.random()*1000|0;
+        songs.push(s);
+      });
+      saveToDisk();
+      renderSongList();
+      setStatus(`✓ ${count} Song(s) importiert`,'');
+    } catch(err) {
+      alert('Fehler beim Importieren: ' + err.message);
+    }
+  };
+  reader.readAsText(file);
 }
 
 // ---- DEFAULT SETUP ----
@@ -626,10 +828,23 @@ function exportPNG(){
     });
     return slots.length?Math.max(...slots.map(s=>s.row))+1:1;
   }
+  function calcMaxBarRows(kb) {
+    const{keys}=buildLayout(kb.size);
+    const slots=[];
+    function findRow(x1,x2){for(let r=0;r<10;r++){if(!slots.filter(s=>s.row===r&&x1<s.x2+2&&x2>s.x1-2).length)return r;}return 0;}
+    kb.zones.forEach(z=>{
+      const sk=keys.find(k=>k.m===z.start)||keys.reduce((a,b)=>Math.abs(b.m-z.start)<Math.abs(a.m-z.start)?b:a);
+      const ek=keys.find(k=>k.m===z.end)||keys.reduce((a,b)=>Math.abs(b.m-z.end)<Math.abs(a.m-z.end)?b:a);
+      const x1=sk.black?sk.x:sk.x+1;const x2=ek.black?ek.x+ek.w:ek.x+ek.w;
+      slots.push({x1,x2,row:findRow(x1,x2)});
+    });
+    return slots.length?Math.max(...slots.map(s=>s.row))+1:1;
+  }
 
   const LABEL_ROW_H=16;
   const labelRowsPerKb=kbs.map(kb=>calcMaxRows(kb));
-  const totalH=TITLE_H + PAD + kbs.reduce((sum,kb,i)=>sum+LABEL_H+WH+8+labelRowsPerKb[i]*LABEL_ROW_H+KB_GAP,0) + PAD;
+  const barRowsPerKb=kbs.map(kb=>calcMaxBarRows(kb));
+  const totalH=TITLE_H + PAD + kbs.reduce((sum,kb,i)=>sum+LABEL_H+WH+3+barRowsPerKb[i]*6+4+labelRowsPerKb[i]*LABEL_ROW_H+KB_GAP,0) + PAD;
   const totalW=maxKbW + PAD*2;
 
   const canvas=document.getElementById('export-canvas');
@@ -683,36 +898,43 @@ function exportPNG(){
       if(zc){ctx.globalAlpha=0.5;ctx.fillStyle=zc;roundRect(ctx,x0+k.x,kbY,k.w,k.h,2,true,false);ctx.globalAlpha=1;}
     });
 
-    // Zone labels - stack vertically if overlapping
-    const LABEL_ROW_H = 16;
-    const labelSlots = []; // [{x1, x2, row}]
+    // Zone bars + labels - stacked if overlapping
+    const BAR_H_E=4, BAR_GAP_E=2, LABEL_ROW_H_E=16;
+    const barSlotsE=[];
+    function findBarRowE(x1,x2){for(let r=0;r<10;r++){if(!barSlotsE.filter(s=>s.row===r&&x1<s.x2+2&&x2>s.x1-2).length)return r;}return 0;}
+    const labelSlotsE=[];
+    function findLabelRowE(x1,x2){for(let r=0;r<10;r++){if(!labelSlotsE.filter(s=>s.row===r&&x1<s.x2+4&&x2>s.x1-4).length)return r;}return 0;}
 
-    function findRow(x1, x2) {
-      for(let row=0; row<10; row++) {
-        const conflicts = labelSlots.filter(s => s.row===row && x1 < s.x2+4 && x2 > s.x1-4);
-        if(!conflicts.length) return row;
-      }
-      return 0;
-    }
-
+    // Draw bars
     kb.zones.forEach(z=>{
       const startKey=keys.find(k=>k.m===z.start)||keys.reduce((a,b)=>Math.abs(b.m-z.start)<Math.abs(a.m-z.start)?b:a);
       const endKey=keys.find(k=>k.m===z.end)||keys.reduce((a,b)=>Math.abs(b.m-z.end)<Math.abs(a.m-z.end)?b:a);
       const x1=x0+(startKey.black?startKey.x:startKey.x+1);
       const x2=x0+(endKey.black?endKey.x+endKey.w:endKey.x+endKey.w);
-      const barW=x2-x1;
-      const cx=(x1+x2)/2;
-      const row = findRow(x1, x2);
-      labelSlots.push({x1, x2, row});
-
+      const barRow=findBarRowE(x1,x2);
+      barSlotsE.push({x1,x2,row:barRow});
+      const barY=kbY+WH+3+barRow*(BAR_H_E+BAR_GAP_E);
       ctx.fillStyle=z.color;ctx.globalAlpha=0.9;
-      roundRect(ctx,x1,kbY+WH+3,barW,5,2,true,false);ctx.globalAlpha=1;
-      ctx.fillStyle=z.color;
-      ctx.font='bold 9px sans-serif';ctx.textAlign='center';
-      ctx.fillText(z.name, cx, kbY+WH+16 + row*LABEL_ROW_H);
+      roundRect(ctx,x1,barY,x2-x1,BAR_H_E,2,true,false);ctx.globalAlpha=1;
     });
 
-    y+=LABEL_H+WH+8+labelRowsPerKb[ki]*LABEL_ROW_H+KB_GAP;
+    // Draw labels below bars
+    const maxBarRowsE=barSlotsE.length?Math.max(...barSlotsE.map(s=>s.row))+1:1;
+    const labelBaseYE=kbY+WH+3+maxBarRowsE*(BAR_H_E+BAR_GAP_E)+4;
+    kb.zones.forEach(z=>{
+      const startKey=keys.find(k=>k.m===z.start)||keys.reduce((a,b)=>Math.abs(b.m-z.start)<Math.abs(a.m-z.start)?b:a);
+      const endKey=keys.find(k=>k.m===z.end)||keys.reduce((a,b)=>Math.abs(b.m-z.end)<Math.abs(a.m-z.end)?b:a);
+      const x1=x0+(startKey.black?startKey.x:startKey.x+1);
+      const x2=x0+(endKey.black?endKey.x+endKey.w:endKey.x+endKey.w);
+      const cx=(x1+x2)/2;
+      const labelRow=findLabelRowE(x1,x2);
+      labelSlotsE.push({x1,x2,row:labelRow});
+      ctx.fillStyle=z.color;
+      ctx.font='bold 9px sans-serif';ctx.textAlign='center';
+      ctx.fillText(z.name,cx,labelBaseYE+9+labelRow*LABEL_ROW_H_E);
+    });
+
+    y+=LABEL_H+WH+3+barRowsPerKb[ki]*6+4+labelRowsPerKb[ki]*LABEL_ROW_H+KB_GAP;
   });
 
   document.getElementById('export-overlay').classList.add('open');
