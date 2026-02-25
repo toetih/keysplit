@@ -575,8 +575,13 @@ function evDown(e){
     S.draggingHandle=h;S.mode='handle';
     e.stopPropagation();return;
   }
-  if(S.mode!=='selecting')return;
   const m=midiFrom(e.target);if(m===null)return;
+  if(S.mode==='idle'&&activeSongId!==null){
+    const kbEl=e.target.closest('.keyboard-block');
+    if(kbEl){const idx=parseInt(kbEl.id.replace('kb-block-',''));if(!isNaN(idx))setActiveKb(idx);}
+    startZoneSelection();
+  }
+  if(S.mode!=='selecting')return;
   S.dragging=true;S.selStart=m;S.selEnd=m;updateRangeBadge();refreshKb(S.activeKb);
 }
 function evMove(e){
