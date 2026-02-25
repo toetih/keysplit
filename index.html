@@ -237,6 +237,7 @@
 </div>
 
 <!-- COLOR POPUP -->
+<div id="color-popup"></div>
 <input type="file" id="import-file-input" accept=".json" style="display:none" onchange="handleImportFile(event)">
 
 <!-- EXPORT OVERLAY -->
@@ -672,7 +673,6 @@ function saveZoneEdit(){
   }
   closeColorPopup();
 }
-}
 function closeColorPopup(){
   document.getElementById('color-popup').classList.remove('open');
   colorPickerTarget = null;
@@ -717,11 +717,15 @@ function exportSongs(){
   if(activeSongId!==null) flushToActiveSong();
   const data = JSON.stringify({version:1, songs}, null, 2);
   const blob = new Blob([data], {type:'application/json'});
+  const url = URL.createObjectURL(blob);
   const a = document.createElement('a');
-  a.href = URL.createObjectURL(blob);
+  a.href = url;
   const date = new Date().toISOString().slice(0,10);
   a.download = `keysplit_backup_${date}.json`;
+  document.body.appendChild(a);
   a.click();
+  document.body.removeChild(a);
+  URL.revokeObjectURL(url);
   setStatus('✓ Songs exportiert','JSON-Datei gespeichert');
 }
 
