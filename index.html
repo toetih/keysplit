@@ -1,0 +1,646 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+<title>KeySplit</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&family=Syne:wght@400;600;800&display=swap');
+  :root {
+    --bg:#0e0e12;--surface:#1a1a22;--surface2:#24242f;--border:#2e2e3e;
+    --text:#f0f0f5;--text-muted:#6b6b85;--accent:#7c5cfc;--accent2:#fc5c7d;
+    --white-key:#e8e8f0;--black-key:#1c1c28;--green:#2ecc71;
+  }
+  *{box-sizing:border-box;margin:0;padding:0;}
+  body{background:var(--bg);color:var(--text);font-family:'Syne',sans-serif;min-height:100vh;overflow-x:hidden;}
+  header{display:flex;align-items:center;justify-content:space-between;padding:14px 20px;border-bottom:1px solid var(--border);background:var(--surface);}
+  .logo{font-size:20px;font-weight:800;}.logo span{color:var(--accent);}
+  button{font-family:'Syne',sans-serif;cursor:pointer;border:none;border-radius:8px;font-size:13px;font-weight:600;transition:all 0.15s;}
+  .btn-primary{background:var(--accent);color:white;padding:8px 16px;}
+  .btn-primary:hover{background:#6a4de0;}
+  .btn-ghost{background:transparent;color:var(--text-muted);padding:8px 12px;border:1px solid var(--border);}
+  .btn-ghost:hover{color:var(--text);border-color:var(--text-muted);}
+  .btn-danger{background:transparent;color:var(--accent2);padding:4px 8px;border:1px solid var(--accent2);font-size:11px;}
+  .btn-danger:hover{background:var(--accent2);color:white;}
+  .btn-success{background:var(--green);color:white;padding:8px 16px;}
+  .btn-success:hover{background:#27ae60;}
+  .btn-small{background:var(--surface2);color:var(--text);padding:5px 10px;font-size:11px;border:1px solid var(--border);}
+  .btn-small:hover{border-color:var(--accent);}
+  .btn-small.active{background:var(--accent);border-color:var(--accent);color:white;}
+  .app-layout{display:flex;height:calc(100vh - 53px);}
+
+  /* ---- SONG SIDEBAR ---- */
+  .song-sidebar{
+    width:200px;min-width:200px;background:#13131a;
+    border-right:1px solid var(--border);
+    display:flex;flex-direction:column;overflow:hidden;
+  }
+  .song-sidebar-header{
+    padding:14px 14px 10px;border-bottom:1px solid var(--border);
+    display:flex;flex-direction:column;gap:8px;
+  }
+  .song-list{flex:1;overflow-y:auto;padding:8px;}
+  .song-item{
+    display:flex;align-items:center;gap:6px;
+    padding:9px 10px;border-radius:8px;margin-bottom:5px;
+    cursor:pointer;border:1px solid transparent;
+    transition:all 0.15s;
+  }
+  .song-item:hover{background:var(--surface2);border-color:var(--border);}
+  .song-item.active{background:var(--surface2);border-color:var(--accent);}
+  .song-item-name{
+    flex:1;font-size:12px;font-weight:600;
+    white-space:nowrap;overflow:hidden;text-overflow:ellipsis;
+  }
+  .song-item-actions{display:flex;gap:4px;opacity:0;transition:opacity 0.15s;}
+  .song-item:hover .song-item-actions{opacity:1;}
+  .song-item.active .song-item-actions{opacity:1;}
+  .song-num{
+    font-size:10px;font-family:'Space Mono',monospace;
+    color:var(--text-muted);min-width:16px;text-align:right;flex-shrink:0;
+  }
+  .drag-handle{
+    cursor:grab;color:var(--text-muted);font-size:14px;
+    padding:0 2px;flex-shrink:0;line-height:1;
+    transition:color 0.15s;
+  }
+  .drag-handle:active{cursor:grabbing;}
+  .song-item:hover .drag-handle{color:var(--text);}
+  .song-item.drag-over-top{border-top:2px solid var(--accent);}
+  .song-item.drag-over-bottom{border-bottom:2px solid var(--accent);}
+  .song-item.dragging{opacity:0.4;}
+
+  /* ---- KB SIDEBAR ---- */
+  .sidebar{width:250px;min-width:250px;background:var(--surface);border-right:1px solid var(--border);display:flex;flex-direction:column;overflow:hidden;}
+  .sidebar-section{padding:14px 16px;border-bottom:1px solid var(--border);}
+  .sidebar-label{font-size:10px;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;color:var(--text-muted);margin-bottom:8px;}
+  .zones-list{flex:1;overflow-y:auto;padding:10px;}
+  .zone-item{display:flex;align-items:center;gap:8px;padding:9px 10px;background:var(--surface2);border-radius:8px;margin-bottom:7px;border:1px solid var(--border);}
+  .zone-color-dot{width:11px;height:11px;border-radius:50%;flex-shrink:0;}
+  .zone-info{flex:1;min-width:0;}
+  .zone-name{font-size:13px;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+  .zone-range{font-size:10px;color:var(--text-muted);font-family:'Space Mono',monospace;}
+  .new-zone-panel{display:none;flex-direction:column;gap:10px;padding:14px 16px;background:#1e1e2e;border-bottom:2px solid var(--accent);}
+  .new-zone-panel.visible{display:flex;}
+  .new-zone-panel input[type="text"]{width:100%;background:var(--surface2);border:1px solid var(--border);border-radius:8px;color:var(--text);font-family:'Syne',sans-serif;font-size:13px;padding:8px 10px;outline:none;}
+  .new-zone-panel input:focus{border-color:var(--accent);}
+  .color-picker{display:flex;gap:7px;flex-wrap:wrap;}
+  .color-swatch{width:24px;height:24px;border-radius:50%;cursor:pointer;border:2px solid transparent;transition:transform 0.15s,border-color 0.15s;}
+  .color-swatch:hover{transform:scale(1.2);}
+  .color-swatch.selected{border-color:white;transform:scale(1.2);}
+  .range-badge{font-family:'Space Mono',monospace;font-size:12px;color:var(--accent);background:var(--surface2);padding:6px 10px;border-radius:6px;border:1px solid var(--border);}
+
+  /* ---- MAIN ---- */
+  .main{flex:1;display:flex;flex-direction:column;overflow:hidden;padding:16px;gap:12px;}
+  .status-bar{display:flex;align-items:center;gap:12px;background:var(--surface);border-radius:10px;padding:10px 14px;border:1px solid var(--border);flex-shrink:0;}
+  .status-text{font-size:13px;color:var(--accent);font-weight:600;}
+  .status-hint{font-size:12px;color:var(--text-muted);margin-left:auto;}
+  .keyboards-container{flex:1;display:flex;flex-direction:column;gap:20px;overflow-y:auto;}
+  .keyboard-block{background:var(--surface);border-radius:12px;border:1px solid var(--border);padding:14px;flex-shrink:0;}
+  .keyboard-block.active-selection{border-color:var(--accent);}
+  .keyboard-block-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:12px;}
+  .keyboard-title{font-size:12px;font-weight:700;color:var(--text-muted);letter-spacing:1px;cursor:pointer;}
+  .keyboard-title:hover{color:var(--text);}
+  .keyboard-wrapper{width:100%;overflow-x:auto;}
+  .keyboard-svg-container{display:inline-block;min-width:100%;}
+  svg.keyboard{display:block;user-select:none;-webkit-user-select:none;touch-action:none;}
+  .white-key{fill:var(--white-key);stroke:#aaaabc;stroke-width:1;}
+  .black-key{fill:var(--black-key);stroke:#0a0a14;stroke-width:0.5;}
+  .zone-overlay{opacity:0.5;pointer-events:none;}
+  .select-overlay{opacity:0.65;pointer-events:none;}
+  .select-styled{background:var(--surface2);border:1px solid var(--border);border-radius:8px;color:var(--text);font-family:'Syne',sans-serif;font-size:12px;padding:6px 8px;outline:none;cursor:pointer;}
+  .empty-hint{text-align:center;color:var(--text-muted);font-size:12px;padding:16px 10px;line-height:1.6;}
+  .kb-count-btn{width:26px;height:26px;border-radius:6px;background:var(--surface2);border:1px solid var(--border);color:var(--text);font-size:16px;display:flex;align-items:center;justify-content:center;cursor:pointer;transition:all 0.15s;}
+  .kb-count-btn:hover{border-color:var(--accent);color:var(--accent);}
+  .kb-count-display{font-size:12px;font-weight:700;min-width:16px;text-align:center;font-family:'Space Mono',monospace;}
+
+  /* ---- SAVE BUTTON IN HEADER ---- */
+  .btn-save-preset{
+    background:transparent;color:var(--green);
+    padding:6px 14px;border:1px solid var(--green);font-size:12px;
+  }
+  .btn-save-preset:hover{background:var(--green);color:white;}
+  .btn-save-preset.saved{background:#1a3a28;color:var(--green);}
+
+  /* ---- INLINE RENAME INPUT ---- */
+  .rename-input{
+    background:var(--surface2);border:1px solid var(--accent);
+    border-radius:6px;color:var(--text);font-family:'Syne',sans-serif;
+    font-size:12px;font-weight:700;padding:3px 8px;outline:none;
+    letter-spacing:0.5px;width:140px;
+  }
+
+  ::-webkit-scrollbar{width:5px;height:5px;}
+  ::-webkit-scrollbar-track{background:transparent;}
+  ::-webkit-scrollbar-thumb{background:var(--border);border-radius:3px;}
+</style>
+</head>
+<body>
+<header>
+  <div class="logo">Key<span>Split</span></div>
+  <div style="display:flex;align-items:center;gap:10px">
+    <span style="font-size:11px;color:var(--text-muted);font-family:'Space Mono',monospace" id="active-song-label">Kein Song geladen</span>
+    <button class="btn-save-preset" id="btn-save" onclick="saveCurrentSong()">💾 Speichern</button>
+  </div>
+</header>
+
+<div class="app-layout">
+
+  <!-- SONG SIDEBAR -->
+  <div class="song-sidebar">
+    <div class="song-sidebar-header">
+      <div class="sidebar-label" style="margin-bottom:0">Songs</div>
+      <button class="btn-primary" style="width:100%;font-size:12px;padding:8px" onclick="newSong()">+ Neuer Song</button>
+    </div>
+    <div class="song-list" id="song-list">
+      <div class="empty-hint">Noch keine Songs.<br>+ Neuer Song klicken.</div>
+    </div>
+  </div>
+
+  <!-- KB SIDEBAR -->
+  <div class="sidebar">
+    <div class="sidebar-section">
+      <div class="sidebar-label">Keyboards</div>
+      <div style="display:flex;align-items:center;gap:8px;margin-bottom:10px">
+        <button class="kb-count-btn" onclick="changeKbCount(-1)">−</button>
+        <span class="kb-count-display" id="kb-count-display">1</span>
+        <button class="kb-count-btn" onclick="changeKbCount(1)">+</button>
+        <span style="font-size:11px;color:var(--text-muted)">Keyboards</span>
+      </div>
+      <div style="display:flex;gap:6px;flex-wrap:wrap" id="kb-tabs"></div>
+    </div>
+    <div class="sidebar-section">
+      <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap">
+        <select class="select-styled" id="key-size-select" onchange="onKeySizeChange()">
+          <option value="49">49 Tasten</option>
+          <option value="61">61 Tasten</option>
+          <option value="73">73 Tasten</option>
+          <option value="76">76 Tasten</option>
+          <option value="88" selected>88 Tasten</option>
+        </select>
+        <button class="btn-primary" onclick="startZoneSelection()">+ Zone</button>
+      </div>
+    </div>
+    <div class="new-zone-panel" id="new-zone-panel">
+      <div class="sidebar-label" style="margin-bottom:0">Neue Zone</div>
+      <div class="range-badge" id="range-badge">← Tasten auf Tastatur wählen</div>
+      <input type="text" id="zone-name-input" placeholder="Bass, Strings, Lead...">
+      <div>
+        <div class="sidebar-label" style="margin-bottom:6px">Farbe</div>
+        <div class="color-picker" id="color-picker"></div>
+      </div>
+      <div style="display:flex;gap:8px">
+        <button class="btn-ghost" style="flex:1;font-size:12px" onclick="cancelZoneSelection()">Abbrechen</button>
+        <button class="btn-success" style="flex:1;font-size:12px" onclick="saveZone()">Speichern</button>
+      </div>
+    </div>
+    <div style="padding:10px 16px 6px;border-bottom:1px solid var(--border)">
+      <div class="sidebar-label" style="margin-bottom:0">Zonen — <span id="zone-kb-label"></span></div>
+    </div>
+    <div class="zones-list" id="zones-list">
+      <div class="empty-hint">Noch keine Zonen.</div>
+    </div>
+  </div>
+
+  <!-- MAIN -->
+  <div class="main" id="main-area">
+    <div class="status-bar">
+      <span class="status-text" id="status-text">Bereit</span>
+      <span class="status-hint" id="status-hint">Neuen Song anlegen oder Song aus der Liste wählen</span>
+    </div>
+    <div class="keyboards-container" id="keyboards-container"></div>
+  </div>
+</div>
+
+<script>
+// ================================================================
+// CONSTANTS
+// ================================================================
+const COLORS=['#7c5cfc','#fc5c7d','#5cf8a0','#fcd05c','#5cb8fc','#fc8a5c','#c45cfc','#fc5cb0','#a0fc5c','#5cfcf8'];
+const KB_START={49:36,61:36,73:28,76:28,88:21};
+const NOTE_NAMES=['C','C#','D','D#','E','F','F#','G','G#','A','A#','B'];
+const WW=22,WH=100,BW=13,BH=62;
+const STORAGE_KEY='keysplit_songs_v1';
+
+function noteName(m){return NOTE_NAMES[m%12]+(Math.floor(m/12)-1);}
+function isBlack(m){return[1,3,6,8,10].includes(m%12);}
+function deepClone(o){return JSON.parse(JSON.stringify(o));}
+
+// ================================================================
+// STATE
+// ================================================================
+// songs: [{id, name, keyboards:[{size,name,zones:[{id,name,color,start,end}]}]}]
+// activeSongId: id or null
+// dirty: unsaved changes
+
+let songs = [];
+let activeSongId = null;
+
+let S = {
+  kbCount:1,
+  activeKb:0,
+  keyboards:[{size:88,name:'Keyboard 1',zones:[]}],
+  mode:'idle',
+  selStart:null,selEnd:null,
+  pendingColor:COLORS[0],
+  dragging:false,
+  dirty:false
+};
+
+// ================================================================
+// PERSISTENCE
+// ================================================================
+function saveToDisk(){
+  localStorage.setItem(STORAGE_KEY, JSON.stringify(songs));
+}
+function loadFromDisk(){
+  try{
+    const raw=localStorage.getItem(STORAGE_KEY);
+    if(raw) songs=JSON.parse(raw);
+  }catch(e){songs=[];}
+}
+
+// ================================================================
+// SONG MANAGEMENT
+// ================================================================
+function newSong(){
+  const name=`Song ${songs.length+1}`;
+  const id=Date.now();
+  const song={
+    id,
+    name,
+    keyboards:deepClone(S.keyboards.map((kb,i)=>({size:kb.size,name:kb.name,zones:[]})))
+  };
+  // Actually start fresh
+  song.keyboards=[{size:88,name:'Keyboard 1',zones:[]}];
+  songs.push(song);
+  saveToDisk();
+  loadSong(id);
+  renderSongList();
+  // Immediately rename
+  setTimeout(()=>startRenameSong(id),50);
+}
+
+function loadSong(id){
+  // Save current state back to active song first
+  if(activeSongId!==null) flushToActiveSong();
+
+  const song=songs.find(s=>s.id===id);
+  if(!song)return;
+  activeSongId=id;
+  // Load into working state
+  const kbs=deepClone(song.keyboards);
+  S.keyboards=kbs;
+  S.kbCount=kbs.length;
+  S.activeKb=0;
+  S.mode='idle';S.selStart=null;S.selEnd=null;S.dirty=false;
+  document.getElementById('new-zone-panel').classList.remove('visible');
+  document.getElementById('kb-count-display').textContent=S.kbCount;
+  document.getElementById('active-song-label').textContent=song.name;
+  renderSongList();
+  renderKbTabs();
+  renderAllKeyboards();
+  renderZonesList();
+  syncSizeSelect();
+  setStatus(`Song geladen: ${song.name}`,'Zonen bearbeiten oder + Zone klicken');
+  markClean();
+}
+
+function flushToActiveSong(){
+  const song=songs.find(s=>s.id===activeSongId);
+  if(!song)return;
+  song.keyboards=deepClone(S.keyboards);
+  saveToDisk();
+}
+
+function saveCurrentSong(){
+  if(activeSongId===null){
+    newSong();return;
+  }
+  flushToActiveSong();
+  markClean();
+  setStatus('✓ Gespeichert','');
+  const btn=document.getElementById('btn-save');
+  btn.classList.add('saved');
+  setTimeout(()=>btn.classList.remove('saved'),1500);
+}
+
+function deleteSong(id,e){
+  e.stopPropagation();
+  const song=songs.find(s=>s.id===id);
+  if(!song)return;
+  if(!confirm(`Song "${song.name}" löschen?`))return;
+  songs=songs.filter(s=>s.id!==id);
+  saveToDisk();
+  if(activeSongId===id){
+    activeSongId=null;
+    S.keyboards=[{size:88,name:'Keyboard 1',zones:[]}];
+    S.kbCount=1;S.activeKb=0;
+    document.getElementById('kb-count-display').textContent=1;
+    document.getElementById('active-song-label').textContent='Kein Song geladen';
+    renderKbTabs();renderAllKeyboards();renderZonesList();syncSizeSelect();
+    setStatus('Bereit','Neuen Song anlegen oder Song aus der Liste wählen');
+  }
+  renderSongList();
+}
+
+function startRenameSong(id){
+  const el=document.getElementById(`song-name-${id}`);
+  if(!el)return;
+  const song=songs.find(s=>s.id===id);
+  if(!song)return;
+  el.innerHTML=`<input class="rename-input" id="song-rename-${id}" value="${song.name}" style="width:110px;font-size:11px;" onblur="finishRenameSong(${id})" onkeydown="if(event.key==='Enter')this.blur();if(event.key==='Escape'){this.dataset.cancel='1';this.blur();}">`;
+  const inp=document.getElementById(`song-rename-${id}`);
+  inp.focus();inp.select();
+}
+
+function finishRenameSong(id){
+  const inp=document.getElementById(`song-rename-${id}`);
+  if(!inp)return;
+  if(inp.dataset.cancel){renderSongList();return;}
+  const val=inp.value.trim();
+  const song=songs.find(s=>s.id===id);
+  if(song&&val){
+    song.name=val;
+    saveToDisk();
+    if(activeSongId===id) document.getElementById('active-song-label').textContent=val;
+  }
+  renderSongList();
+}
+
+// ================================================================
+// RENDER SONG LIST
+// ================================================================
+function renderSongList(){
+  const el=document.getElementById('song-list');
+  if(!songs.length){
+    el.innerHTML='<div class="empty-hint">Noch keine Songs.<br>+ Neuer Song klicken.</div>';
+    return;
+  }
+  el.innerHTML=songs.map((song,i)=>`
+    <div class="song-item ${song.id===activeSongId?'active':''}" 
+         draggable="true" data-song-id="${song.id}"
+         onclick="loadSong(${song.id})">
+      <span class="drag-handle" onclick="event.stopPropagation()" title="Verschieben">⠿</span>
+      <span class="song-num">${i+1}</span>
+      <span class="song-item-name" id="song-name-${song.id}" ondblclick="startRenameSong(${song.id});event.stopPropagation()">${song.name}</span>
+      <span class="song-item-actions">
+        <button class="btn-danger" onclick="deleteSong(${song.id},event)" style="padding:2px 6px;font-size:10px">✕</button>
+      </span>
+    </div>`).join('');
+  bindSongDrag();
+}
+
+// ================================================================
+// DRAG & DROP SONG REORDER
+// ================================================================
+let dragSrcId = null;
+
+function bindSongDrag(){
+  const list = document.getElementById('song-list');
+  list.querySelectorAll('.song-item[draggable]').forEach(item => {
+    item.addEventListener('dragstart', e => {
+      dragSrcId = parseInt(item.dataset.songId);
+      item.classList.add('dragging');
+      e.dataTransfer.effectAllowed = 'move';
+    });
+    item.addEventListener('dragend', () => {
+      list.querySelectorAll('.song-item').forEach(el => {
+        el.classList.remove('dragging','drag-over-top','drag-over-bottom');
+      });
+      dragSrcId = null;
+    });
+    item.addEventListener('dragover', e => {
+      e.preventDefault();
+      if(dragSrcId === parseInt(item.dataset.songId)) return;
+      const rect = item.getBoundingClientRect();
+      list.querySelectorAll('.song-item').forEach(el => el.classList.remove('drag-over-top','drag-over-bottom'));
+      item.classList.add(e.clientY < rect.top + rect.height / 2 ? 'drag-over-top' : 'drag-over-bottom');
+    });
+    item.addEventListener('dragleave', () => {
+      item.classList.remove('drag-over-top','drag-over-bottom');
+    });
+    item.addEventListener('drop', e => {
+      e.preventDefault();
+      if(dragSrcId === null) return;
+      const targetId = parseInt(item.dataset.songId);
+      if(dragSrcId === targetId) return;
+      const insertBefore = e.clientY < item.getBoundingClientRect().top + item.getBoundingClientRect().height / 2;
+      const srcIdx = songs.findIndex(s => s.id === dragSrcId);
+      const [moved] = songs.splice(srcIdx, 1);
+      const newTgt = songs.findIndex(s => s.id === targetId);
+      songs.splice(insertBefore ? newTgt : newTgt + 1, 0, moved);
+      saveToDisk();
+      renderSongList();
+    });
+  });
+}
+
+// ================================================================
+// KEYBOARD LAYOUT + RENDER
+// ================================================================
+function buildLayout(size){
+  const start=KB_START[size],whiteX={};let wx=0;
+  for(let i=0;i<size;i++){const m=start+i;if(!isBlack(m)){whiteX[m]=wx;wx+=WW;}}
+  const keys=[];
+  for(let i=0;i<size;i++){const m=start+i;if(!isBlack(m))keys.push({m,black:false,x:whiteX[m],y:0,w:WW,h:WH});}
+  for(let i=0;i<size;i++){const m=start+i;if(isBlack(m)&&whiteX[m-1]!==undefined)keys.push({m,black:true,x:whiteX[m-1]+WW-BW/2-1,y:0,w:BW,h:BH});}
+  return{keys,totalW:wx};
+}
+
+function renderKbSVG(kbIdx){
+  const kb=S.keyboards[kbIdx];
+  const{keys,totalW}=buildLayout(kb.size);
+  const W=totalW+2,H=WH+4;
+  const isActive=kbIdx===S.activeKb;
+  let svg=`<svg class="keyboard" viewBox="0 0 ${W} ${H}" width="${W}" height="${H}" xmlns="http://www.w3.org/2000/svg">`;
+  const whites=keys.filter(k=>!k.black),blacks=keys.filter(k=>k.black);
+  function zoneColor(m){let c=null;kb.zones.forEach(z=>{if(m>=z.start&&m<=z.end)c=z.color;});return c;}
+  const selMin=S.selStart!==null?Math.min(S.selStart,S.selEnd??S.selStart):null;
+  const selMax=S.selStart!==null?Math.max(S.selStart,S.selEnd??S.selStart):null;
+  const inSel=(m)=>isActive&&S.mode==='selecting'&&selMin!==null&&m>=selMin&&m<=selMax;
+  whites.forEach(k=>{
+    const zc=zoneColor(k.m),sel=inSel(k.m);
+    svg+=`<rect class="white-key" data-m="${k.m}" x="${k.x+1}" y="1" width="${k.w-1}" height="${k.h}" rx="2"/>`;
+    if(zc)svg+=`<rect class="zone-overlay" x="${k.x+1}" y="1" width="${k.w-1}" height="${k.h}" rx="2" fill="${zc}"/>`;
+    if(sel)svg+=`<rect class="select-overlay" x="${k.x+1}" y="1" width="${k.w-1}" height="${k.h}" rx="2" fill="#ffffff"/>`;
+  });
+  blacks.forEach(k=>{
+    const zc=zoneColor(k.m),sel=inSel(k.m);
+    svg+=`<rect class="black-key" data-m="${k.m}" x="${k.x}" y="0" width="${k.w}" height="${k.h}" rx="2"/>`;
+    if(zc)svg+=`<rect class="zone-overlay" x="${k.x}" y="0" width="${k.w}" height="${k.h}" rx="2" fill="${zc}"/>`;
+    if(sel)svg+=`<rect class="select-overlay" x="${k.x}" y="0" width="${k.w}" height="${k.h}" rx="2" fill="#aaaaff"/>`;
+  });
+  svg+=`</svg>`;return svg;
+}
+
+function renderAllKeyboards(){
+  const container=document.getElementById('keyboards-container');
+  container.innerHTML='';
+  S.keyboards.forEach((kb,i)=>{
+    const div=document.createElement('div');
+    div.className='keyboard-block';div.id=`kb-block-${i}`;
+    div.innerHTML=`<div class="keyboard-block-header"><span class="keyboard-title" id="kb-title-${i}" ondblclick="startRenameKb(${i})" title="Doppelklick zum Umbenennen">${kb.name}</span></div><div class="keyboard-wrapper"><div class="keyboard-svg-container" id="kb-svg-${i}">${renderKbSVG(i)}</div></div>`;
+    container.appendChild(div);
+  });
+  bindEvents();
+}
+
+function refreshKb(idx){
+  const el=document.getElementById(`kb-svg-${idx}`);
+  if(el)el.innerHTML=renderKbSVG(idx);
+}
+
+// ================================================================
+// EVENTS
+// ================================================================
+function bindEvents(){
+  const container=document.getElementById('keyboards-container');
+  container.addEventListener('mousedown',evDown);
+  container.addEventListener('mousemove',evMove);
+  container.addEventListener('mouseup',evUp);
+  container.addEventListener('touchstart',evTouchStart,{passive:false});
+  container.addEventListener('touchmove',evTouchMove,{passive:false});
+  container.addEventListener('touchend',evTouchEnd);
+}
+function midiFrom(el){const m=el&&el.dataset&&el.dataset.m;return m!==undefined?parseInt(m):null;}
+function midiFromTouch(e){const t=e.touches[0]||e.changedTouches[0];const el=document.elementFromPoint(t.clientX,t.clientY);return midiFrom(el);}
+function evDown(e){if(S.mode!=='selecting')return;const m=midiFrom(e.target);if(m===null)return;S.dragging=true;S.selStart=m;S.selEnd=m;updateRangeBadge();refreshKb(S.activeKb);}
+function evMove(e){if(S.mode!=='selecting'||!S.dragging)return;const m=midiFrom(e.target);if(m===null)return;S.selEnd=m;updateRangeBadge();refreshKb(S.activeKb);}
+function evUp(e){if(S.mode!=='selecting')return;S.dragging=false;const m=midiFrom(e.target);if(m!==null){S.selEnd=m;updateRangeBadge();refreshKb(S.activeKb);}}
+function evTouchStart(e){if(S.mode!=='selecting')return;e.preventDefault();const m=midiFromTouch(e);if(m===null)return;S.dragging=true;S.selStart=m;S.selEnd=m;updateRangeBadge();refreshKb(S.activeKb);}
+function evTouchMove(e){if(S.mode!=='selecting'||!S.dragging)return;e.preventDefault();const m=midiFromTouch(e);if(m!==null){S.selEnd=m;updateRangeBadge();refreshKb(S.activeKb);}}
+function evTouchEnd(e){if(S.mode!=='selecting')return;S.dragging=false;const m=midiFromTouch(e);if(m!==null){S.selEnd=m;updateRangeBadge();refreshKb(S.activeKb);}}
+
+// ================================================================
+// ZONE FLOW
+// ================================================================
+function startZoneSelection(){
+  if(activeSongId===null){setStatus('⚠ Erst Song auswählen','+ Neuer Song in der linken Liste');return;}
+  S.mode='selecting';S.selStart=null;S.selEnd=null;S.dragging=false;
+  document.getElementById('new-zone-panel').classList.add('visible');
+  document.getElementById('zone-name-input').value='';
+  document.getElementById(`kb-block-${S.activeKb}`)?.classList.add('active-selection');
+  renderColorPicker();updateRangeBadge();
+  setStatus('Zone definieren','Tasten auf der Tastatur antippen / ziehen');
+  refreshKb(S.activeKb);
+}
+function cancelZoneSelection(){
+  S.mode='idle';S.selStart=null;S.selEnd=null;S.dragging=false;
+  document.getElementById('new-zone-panel').classList.remove('visible');
+  document.querySelectorAll('.keyboard-block').forEach(el=>el.classList.remove('active-selection'));
+  setStatus('Bereit','Zonen bearbeiten oder speichern');refreshKb(S.activeKb);
+}
+function saveZone(){
+  const name=document.getElementById('zone-name-input').value.trim();
+  if(!name){document.getElementById('zone-name-input').focus();return;}
+  if(S.selStart===null||S.selEnd===null){setStatus('⚠ Erst Tasten wählen','Tastatur antippen und ziehen');return;}
+  const s=Math.min(S.selStart,S.selEnd),e=Math.max(S.selStart,S.selEnd);
+  S.keyboards[S.activeKb].zones.push({id:Date.now(),name,color:S.pendingColor,start:s,end:e});
+  markDirty();
+  cancelZoneSelection();renderZonesList();refreshKb(S.activeKb);
+  setStatus(`✓ Zone "${name}" hinzugefügt`,'Vergiss nicht zu speichern!');
+}
+function deleteZone(id){
+  S.keyboards[S.activeKb].zones=S.keyboards[S.activeKb].zones.filter(z=>z.id!==id);
+  markDirty();renderZonesList();refreshKb(S.activeKb);
+}
+function updateRangeBadge(){
+  const el=document.getElementById('range-badge');
+  if(S.selStart===null){el.textContent='← Tasten auf Tastatur wählen';return;}
+  const s=Math.min(S.selStart,S.selEnd??S.selStart),e2=Math.max(S.selStart,S.selEnd??S.selStart);
+  el.textContent=`${noteName(s)}  →  ${noteName(e2)}`;
+}
+
+// ================================================================
+// ZONES LIST
+// ================================================================
+function renderZonesList(){
+  document.getElementById('zone-kb-label').textContent=S.keyboards[S.activeKb]?.name||'';
+  const zones=S.keyboards[S.activeKb]?.zones||[];
+  const el=document.getElementById('zones-list');
+  if(!zones.length){el.innerHTML='<div class="empty-hint">Noch keine Zonen.<br>+ Zone klicken, dann Tasten markieren.</div>';return;}
+  el.innerHTML=zones.map(z=>`<div class="zone-item"><div class="zone-color-dot" style="background:${z.color}"></div><div class="zone-info"><div class="zone-name">${z.name}</div><div class="zone-range">${noteName(z.start)} – ${noteName(z.end)}</div></div><button class="btn-danger" onclick="deleteZone(${z.id})">✕</button></div>`).join('');
+}
+
+// ================================================================
+// COLOR
+// ================================================================
+function renderColorPicker(){
+  document.getElementById('color-picker').innerHTML=COLORS.map(c=>`<div class="color-swatch ${c===S.pendingColor?'selected':''}" style="background:${c}" onclick="pickColor('${c}')"></div>`).join('');
+}
+function pickColor(c){S.pendingColor=c;renderColorPicker();}
+
+// ================================================================
+// KB COUNT / TABS
+// ================================================================
+function changeKbCount(d){
+  const n=Math.max(1,Math.min(3,S.kbCount+d));if(n===S.kbCount)return;
+  if(n>S.kbCount)S.keyboards.push({size:88,name:`Keyboard ${n}`,zones:[]});
+  else{S.keyboards.pop();if(S.activeKb>=n)S.activeKb=n-1;}
+  S.kbCount=n;document.getElementById('kb-count-display').textContent=n;
+  markDirty();renderKbTabs();renderAllKeyboards();renderZonesList();syncSizeSelect();
+}
+function renderKbTabs(){
+  document.getElementById('kb-tabs').innerHTML=S.keyboards.map((kb,i)=>`<button class="btn-small ${i===S.activeKb?'active':''}" onclick="setActiveKb(${i})">${kb.name}</button>`).join('');
+}
+function setActiveKb(i){
+  S.activeKb=i;renderKbTabs();renderZonesList();syncSizeSelect();
+  if(S.mode==='selecting')cancelZoneSelection();
+}
+function syncSizeSelect(){document.getElementById('key-size-select').value=S.keyboards[S.activeKb]?.size||88;}
+function onKeySizeChange(){S.keyboards[S.activeKb].size=parseInt(document.getElementById('key-size-select').value);markDirty();refreshKb(S.activeKb);}
+
+// ================================================================
+// KB RENAME
+// ================================================================
+function startRenameKb(i){
+  const el=document.getElementById(`kb-title-${i}`);if(!el)return;
+  const current=S.keyboards[i].name;
+  el.innerHTML=`<input class="rename-input" id="kb-rename-input-${i}" value="${current}" onblur="finishRenameKb(${i})" onkeydown="if(event.key==='Enter')this.blur();if(event.key==='Escape'){this.dataset.cancel='1';this.blur();}">`;
+  const inp=document.getElementById(`kb-rename-input-${i}`);inp.focus();inp.select();
+}
+function finishRenameKb(i){
+  const inp=document.getElementById(`kb-rename-input-${i}`);if(!inp)return;
+  if(!inp.dataset.cancel){
+    const val=inp.value.trim()||S.keyboards[i].name;
+    S.keyboards[i].name=val;markDirty();
+  }
+  renderAllKeyboards();renderKbTabs();renderZonesList();
+}
+
+// ================================================================
+// DIRTY STATE
+// ================================================================
+function markDirty(){
+  S.dirty=true;
+  const btn=document.getElementById('btn-save');
+  btn.textContent='💾 Speichern*';btn.style.color='#fcd05c';btn.style.borderColor='#fcd05c';
+}
+function markClean(){
+  S.dirty=false;
+  const btn=document.getElementById('btn-save');
+  btn.textContent='💾 Speichern';btn.style.color='var(--green)';btn.style.borderColor='var(--green)';
+}
+
+// ================================================================
+// UTILS
+// ================================================================
+function setStatus(t,h){document.getElementById('status-text').textContent=t;document.getElementById('status-hint').textContent=h;}
+
+// ================================================================
+// INIT
+// ================================================================
+loadFromDisk();
+renderSongList();
+renderKbTabs();
+renderAllKeyboards();
+renderZonesList();
+setStatus('Bereit','Neuen Song anlegen oder Song aus der Liste wählen');
+
+// Auto-save on page hide
+window.addEventListener('visibilitychange',()=>{if(document.hidden&&activeSongId!==null)flushToActiveSong();});
+window.addEventListener('beforeunload',()=>{if(activeSongId!==null)flushToActiveSong();});
+</script>
+</body>
+</html>
