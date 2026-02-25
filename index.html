@@ -13,133 +13,119 @@
   }
   *{box-sizing:border-box;margin:0;padding:0;}
   body{background:var(--bg);color:var(--text);font-family:'Syne',sans-serif;min-height:100vh;overflow-x:hidden;}
-  header{display:flex;align-items:center;justify-content:space-between;padding:14px 20px;border-bottom:1px solid var(--border);background:var(--surface);}
+  header{display:flex;align-items:center;justify-content:space-between;padding:12px 20px;border-bottom:1px solid var(--border);background:var(--surface);flex-shrink:0;}
   .logo{font-size:20px;font-weight:800;}.logo span{color:var(--accent);}
   button{font-family:'Syne',sans-serif;cursor:pointer;border:none;border-radius:8px;font-size:13px;font-weight:600;transition:all 0.15s;}
-  .btn-primary{background:var(--accent);color:white;padding:8px 16px;}
+  .btn-primary{background:var(--accent);color:white;padding:7px 14px;}
   .btn-primary:hover{background:#6a4de0;}
-  .btn-ghost{background:transparent;color:var(--text-muted);padding:8px 12px;border:1px solid var(--border);}
+  .btn-ghost{background:transparent;color:var(--text-muted);padding:7px 12px;border:1px solid var(--border);}
   .btn-ghost:hover{color:var(--text);border-color:var(--text-muted);}
   .btn-danger{background:transparent;color:var(--accent2);padding:4px 8px;border:1px solid var(--accent2);font-size:11px;}
   .btn-danger:hover{background:var(--accent2);color:white;}
-  .btn-success{background:var(--green);color:white;padding:8px 16px;}
+  .btn-success{background:var(--green);color:white;padding:7px 14px;}
   .btn-success:hover{background:#27ae60;}
-  .btn-small{background:var(--surface2);color:var(--text);padding:5px 10px;font-size:11px;border:1px solid var(--border);}
-  .btn-small:hover{border-color:var(--accent);}
-  .btn-small.active{background:var(--accent);border-color:var(--accent);color:white;}
-  .app-layout{display:flex;height:calc(100vh - 53px);}
+  .btn-export{background:transparent;color:#5cb8fc;padding:6px 14px;border:1px solid #5cb8fc;font-size:12px;}
+  .btn-export:hover{background:#5cb8fc;color:#0e0e12;}
+  .btn-save-preset{background:transparent;color:var(--green);padding:6px 14px;border:1px solid var(--green);font-size:12px;}
+  .btn-save-preset:hover{background:var(--green);color:white;}
+  .app-layout{display:flex;height:calc(100vh - 53px);overflow:hidden;}
 
-  /* ---- SONG SIDEBAR ---- */
-  .song-sidebar{
-    width:200px;min-width:200px;background:#13131a;
-    border-right:1px solid var(--border);
-    display:flex;flex-direction:column;overflow:hidden;
-  }
-  .song-sidebar-header{
-    padding:14px 14px 10px;border-bottom:1px solid var(--border);
-    display:flex;flex-direction:column;gap:8px;
-  }
-  .song-list{flex:1;overflow-y:auto;padding:8px;}
-  .song-item{
-    display:flex;align-items:center;gap:6px;
-    padding:9px 10px;border-radius:8px;margin-bottom:5px;
-    cursor:pointer;border:1px solid transparent;
-    transition:all 0.15s;
-  }
+  /* SONG SIDEBAR */
+  .song-sidebar{width:190px;min-width:190px;background:#13131a;border-right:1px solid var(--border);display:flex;flex-direction:column;overflow:hidden;}
+  .song-sidebar-header{padding:12px 12px 10px;border-bottom:1px solid var(--border);display:flex;flex-direction:column;gap:8px;}
+  .song-list{flex:1;overflow-y:auto;padding:6px;}
+  .song-item{display:flex;align-items:center;gap:5px;padding:8px 8px;border-radius:8px;margin-bottom:4px;cursor:pointer;border:1px solid transparent;transition:all 0.15s;}
   .song-item:hover{background:var(--surface2);border-color:var(--border);}
   .song-item.active{background:var(--surface2);border-color:var(--accent);}
-  .song-item-name{
-    flex:1;font-size:12px;font-weight:600;
-    white-space:nowrap;overflow:hidden;text-overflow:ellipsis;
-  }
-  .song-item-actions{display:flex;gap:4px;opacity:0;transition:opacity 0.15s;}
-  .song-item:hover .song-item-actions{opacity:1;}
-  .song-item.active .song-item-actions{opacity:1;}
-  .song-num{
-    font-size:10px;font-family:'Space Mono',monospace;
-    color:var(--text-muted);min-width:16px;text-align:right;flex-shrink:0;
-  }
-  .drag-handle{
-    cursor:grab;color:var(--text-muted);font-size:14px;
-    padding:0 2px;flex-shrink:0;line-height:1;
-    transition:color 0.15s;
-  }
+  .song-item-name{flex:1;font-size:12px;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+  .song-item-actions{display:flex;gap:3px;opacity:0;transition:opacity 0.15s;}
+  .song-item:hover .song-item-actions,.song-item.active .song-item-actions{opacity:1;}
+  .song-num{font-size:10px;font-family:'Space Mono',monospace;color:var(--text-muted);min-width:14px;text-align:right;flex-shrink:0;}
+  .drag-handle{cursor:grab;color:var(--text-muted);font-size:13px;padding:0 1px;flex-shrink:0;line-height:1;transition:color 0.15s;}
   .drag-handle:active{cursor:grabbing;}
   .song-item:hover .drag-handle{color:var(--text);}
   .song-item.drag-over-top{border-top:2px solid var(--accent);}
   .song-item.drag-over-bottom{border-bottom:2px solid var(--accent);}
   .song-item.dragging{opacity:0.4;}
 
-  /* ---- KB SIDEBAR ---- */
-  .sidebar{width:250px;min-width:250px;background:var(--surface);border-right:1px solid var(--border);display:flex;flex-direction:column;overflow:hidden;}
-  .sidebar-section{padding:14px 16px;border-bottom:1px solid var(--border);}
-  .sidebar-label{font-size:10px;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;color:var(--text-muted);margin-bottom:8px;}
-  .zones-list{flex:1;overflow-y:auto;padding:10px;}
-  .zone-item{display:flex;align-items:center;gap:8px;padding:9px 10px;background:var(--surface2);border-radius:8px;margin-bottom:7px;border:1px solid var(--border);}
-  .zone-color-dot{width:11px;height:11px;border-radius:50%;flex-shrink:0;}
+  /* KB SIDEBAR */
+  .sidebar{width:240px;min-width:240px;background:var(--surface);border-right:1px solid var(--border);display:flex;flex-direction:column;overflow:hidden;}
+  .sidebar-section{padding:12px 14px;border-bottom:1px solid var(--border);}
+  .sidebar-label{font-size:10px;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;color:var(--text-muted);margin-bottom:7px;}
+  .zones-list{flex:1;overflow-y:auto;padding:8px;}
+  .zone-item{display:flex;align-items:center;gap:7px;padding:8px 9px;background:var(--surface2);border-radius:8px;margin-bottom:6px;border:1px solid var(--border);}
+  .zone-color-dot{width:10px;height:10px;border-radius:50%;flex-shrink:0;}
   .zone-info{flex:1;min-width:0;}
-  .zone-name{font-size:13px;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+  .zone-name{font-size:12px;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
   .zone-range{font-size:10px;color:var(--text-muted);font-family:'Space Mono',monospace;}
-  .new-zone-panel{display:none;flex-direction:column;gap:10px;padding:14px 16px;background:#1e1e2e;border-bottom:2px solid var(--accent);}
+  .new-zone-panel{display:none;flex-direction:column;gap:9px;padding:12px 14px;background:#1e1e2e;border-bottom:2px solid var(--accent);}
   .new-zone-panel.visible{display:flex;}
-  .new-zone-panel input[type="text"]{width:100%;background:var(--surface2);border:1px solid var(--border);border-radius:8px;color:var(--text);font-family:'Syne',sans-serif;font-size:13px;padding:8px 10px;outline:none;}
+  .new-zone-panel input[type="text"]{width:100%;background:var(--surface2);border:1px solid var(--border);border-radius:8px;color:var(--text);font-family:'Syne',sans-serif;font-size:13px;padding:7px 10px;outline:none;}
   .new-zone-panel input:focus{border-color:var(--accent);}
-  .color-picker{display:flex;gap:7px;flex-wrap:wrap;}
-  .color-swatch{width:24px;height:24px;border-radius:50%;cursor:pointer;border:2px solid transparent;transition:transform 0.15s,border-color 0.15s;}
+  .color-picker{display:flex;gap:6px;flex-wrap:wrap;}
+  .color-swatch{width:22px;height:22px;border-radius:50%;cursor:pointer;border:2px solid transparent;transition:transform 0.15s,border-color 0.15s;}
   .color-swatch:hover{transform:scale(1.2);}
   .color-swatch.selected{border-color:white;transform:scale(1.2);}
-  .range-badge{font-family:'Space Mono',monospace;font-size:12px;color:var(--accent);background:var(--surface2);padding:6px 10px;border-radius:6px;border:1px solid var(--border);}
+  .range-badge{font-family:'Space Mono',monospace;font-size:11px;color:var(--accent);background:var(--surface2);padding:5px 9px;border-radius:6px;border:1px solid var(--border);}
 
-  /* ---- MAIN ---- */
-  .main{flex:1;display:flex;flex-direction:column;overflow:hidden;padding:16px;gap:12px;}
-  .status-bar{display:flex;align-items:center;gap:12px;background:var(--surface);border-radius:10px;padding:10px 14px;border:1px solid var(--border);flex-shrink:0;}
-  .status-text{font-size:13px;color:var(--accent);font-weight:600;}
-  .status-hint{font-size:12px;color:var(--text-muted);margin-left:auto;}
-  .keyboards-container{flex:1;display:flex;flex-direction:column;gap:20px;overflow-y:auto;}
-  .keyboard-block{background:var(--surface);border-radius:12px;border:1px solid var(--border);padding:14px;flex-shrink:0;}
+  /* MAIN */
+  .main{flex:1;display:flex;flex-direction:column;overflow:hidden;padding:14px;gap:10px;}
+  .status-bar{display:flex;align-items:center;gap:10px;background:var(--surface);border-radius:9px;padding:8px 14px;border:1px solid var(--border);flex-shrink:0;}
+  .status-text{font-size:12px;color:var(--accent);font-weight:600;}
+  .status-hint{font-size:11px;color:var(--text-muted);margin-left:auto;}
+  .keyboards-container{flex:1;display:flex;flex-direction:column;gap:14px;overflow-y:auto;}
+
+  /* KEYBOARD BLOCK */
+  .keyboard-block{
+    background:var(--surface);border-radius:10px;
+    border:1px solid var(--border);padding:12px;flex-shrink:0;
+    cursor:pointer;transition:border-color 0.15s;
+  }
+  .keyboard-block:hover{border-color:var(--text-muted);}
+  .keyboard-block.active-kb{border-color:var(--accent);}
   .keyboard-block.active-selection{border-color:var(--accent);}
-  .keyboard-block-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:12px;}
-  .keyboard-title{font-size:12px;font-weight:700;color:var(--text-muted);letter-spacing:1px;cursor:pointer;}
-  .keyboard-title:hover{color:var(--text);}
+  .keyboard-block-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:10px;}
+  .keyboard-title{font-size:12px;font-weight:700;color:var(--text-muted);letter-spacing:1px;cursor:text;}
+  .keyboard-block.active-kb .keyboard-title{color:var(--accent);}
   .keyboard-wrapper{width:100%;overflow-x:auto;}
-  .keyboard-svg-container{display:inline-block;min-width:100%;}
+  .keyboard-svg-container{display:inline-block;}
   svg.keyboard{display:block;user-select:none;-webkit-user-select:none;touch-action:none;}
   .white-key{fill:var(--white-key);stroke:#aaaabc;stroke-width:1;}
   .black-key{fill:var(--black-key);stroke:#0a0a14;stroke-width:0.5;}
   .zone-overlay{opacity:0.5;pointer-events:none;}
   .select-overlay{opacity:0.65;pointer-events:none;}
+  .active-kb-badge{
+    font-size:9px;font-weight:700;letter-spacing:1px;text-transform:uppercase;
+    color:var(--accent);background:#1e1a35;border:1px solid var(--accent);
+    border-radius:4px;padding:2px 6px;
+  }
+
+  /* MISC */
   .select-styled{background:var(--surface2);border:1px solid var(--border);border-radius:8px;color:var(--text);font-family:'Syne',sans-serif;font-size:12px;padding:6px 8px;outline:none;cursor:pointer;}
   .empty-hint{text-align:center;color:var(--text-muted);font-size:12px;padding:16px 10px;line-height:1.6;}
-  .kb-count-btn{width:26px;height:26px;border-radius:6px;background:var(--surface2);border:1px solid var(--border);color:var(--text);font-size:16px;display:flex;align-items:center;justify-content:center;cursor:pointer;transition:all 0.15s;}
+  .kb-count-btn{width:24px;height:24px;border-radius:6px;background:var(--surface2);border:1px solid var(--border);color:var(--text);font-size:15px;display:flex;align-items:center;justify-content:center;cursor:pointer;transition:all 0.15s;}
   .kb-count-btn:hover{border-color:var(--accent);color:var(--accent);}
-  .kb-count-display{font-size:12px;font-weight:700;min-width:16px;text-align:center;font-family:'Space Mono',monospace;}
-
-  /* ---- SAVE BUTTON IN HEADER ---- */
-  .btn-save-preset{
-    background:transparent;color:var(--green);
-    padding:6px 14px;border:1px solid var(--green);font-size:12px;
-  }
-  .btn-save-preset:hover{background:var(--green);color:white;}
-  .btn-save-preset.saved{background:#1a3a28;color:var(--green);}
-
-  /* ---- INLINE RENAME INPUT ---- */
-  .rename-input{
-    background:var(--surface2);border:1px solid var(--accent);
-    border-radius:6px;color:var(--text);font-family:'Syne',sans-serif;
-    font-size:12px;font-weight:700;padding:3px 8px;outline:none;
-    letter-spacing:0.5px;width:140px;
-  }
-
+  .kb-count-display{font-size:12px;font-weight:700;min-width:14px;text-align:center;font-family:'Space Mono',monospace;}
+  .rename-input{background:var(--surface2);border:1px solid var(--accent);border-radius:6px;color:var(--text);font-family:'Syne',sans-serif;font-size:12px;font-weight:700;padding:2px 7px;outline:none;letter-spacing:0.5px;width:140px;}
   ::-webkit-scrollbar{width:5px;height:5px;}
   ::-webkit-scrollbar-track{background:transparent;}
   ::-webkit-scrollbar-thumb{background:var(--border);border-radius:3px;}
+
+  /* EXPORT PREVIEW OVERLAY */
+  #export-overlay{
+    display:none;position:fixed;inset:0;background:rgba(0,0,0,0.85);
+    z-index:200;align-items:center;justify-content:center;flex-direction:column;gap:16px;
+  }
+  #export-overlay.open{display:flex;}
+  #export-canvas{border-radius:8px;max-width:95vw;max-height:80vh;object-fit:contain;}
 </style>
 </head>
 <body>
 <header>
   <div class="logo">Key<span>Split</span></div>
-  <div style="display:flex;align-items:center;gap:10px">
-    <span style="font-size:11px;color:var(--text-muted);font-family:'Space Mono',monospace" id="active-song-label">Kein Song geladen</span>
+  <div style="display:flex;align-items:center;gap:8px">
+    <span style="font-size:11px;color:var(--text-muted);font-family:'Space Mono',monospace" id="active-song-label">Kein Song</span>
+    <button class="btn-export" onclick="exportPNG()">📷 Exportieren</button>
     <button class="btn-save-preset" id="btn-save" onclick="saveCurrentSong()">💾 Speichern</button>
   </div>
 </header>
@@ -150,10 +136,10 @@
   <div class="song-sidebar">
     <div class="song-sidebar-header">
       <div class="sidebar-label" style="margin-bottom:0">Songs</div>
-      <button class="btn-primary" style="width:100%;font-size:12px;padding:8px" onclick="newSong()">+ Neuer Song</button>
+      <button class="btn-primary" style="width:100%;font-size:12px;padding:7px" onclick="newSong()">+ Neuer Song</button>
     </div>
     <div class="song-list" id="song-list">
-      <div class="empty-hint">Noch keine Songs.<br>+ Neuer Song klicken.</div>
+      <div class="empty-hint">Noch keine Songs.</div>
     </div>
   </div>
 
@@ -167,7 +153,6 @@
         <button class="kb-count-btn" onclick="changeKbCount(1)">+</button>
         <span style="font-size:11px;color:var(--text-muted)">Keyboards</span>
       </div>
-      <div style="display:flex;gap:6px;flex-wrap:wrap" id="kb-tabs"></div>
     </div>
     <div class="sidebar-section">
       <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap">
@@ -180,22 +165,26 @@
         </select>
         <button class="btn-primary" onclick="startZoneSelection()">+ Zone</button>
       </div>
+      <div style="margin-top:8px;font-size:10px;color:var(--text-muted)">
+        Aktiv: <span id="active-kb-name" style="color:var(--accent)">—</span><br>
+        <span style="font-size:9px">(Keyboard anklicken zum Wechseln)</span>
+      </div>
     </div>
     <div class="new-zone-panel" id="new-zone-panel">
       <div class="sidebar-label" style="margin-bottom:0">Neue Zone</div>
       <div class="range-badge" id="range-badge">← Tasten auf Tastatur wählen</div>
       <input type="text" id="zone-name-input" placeholder="Bass, Strings, Lead...">
       <div>
-        <div class="sidebar-label" style="margin-bottom:6px">Farbe</div>
+        <div class="sidebar-label" style="margin-bottom:5px">Farbe</div>
         <div class="color-picker" id="color-picker"></div>
       </div>
       <div style="display:flex;gap:8px">
-        <button class="btn-ghost" style="flex:1;font-size:12px" onclick="cancelZoneSelection()">Abbrechen</button>
-        <button class="btn-success" style="flex:1;font-size:12px" onclick="saveZone()">Speichern</button>
+        <button class="btn-ghost" style="flex:1;font-size:11px" onclick="cancelZoneSelection()">Abbrechen</button>
+        <button class="btn-success" style="flex:1;font-size:11px" onclick="saveZone()">Speichern</button>
       </div>
     </div>
-    <div style="padding:10px 16px 6px;border-bottom:1px solid var(--border)">
-      <div class="sidebar-label" style="margin-bottom:0">Zonen — <span id="zone-kb-label"></span></div>
+    <div style="padding:8px 14px 6px;border-bottom:1px solid var(--border)">
+      <div class="sidebar-label" style="margin-bottom:0">Zonen — <span id="zone-kb-label" style="color:var(--accent)"></span></div>
     </div>
     <div class="zones-list" id="zones-list">
       <div class="empty-hint">Noch keine Zonen.</div>
@@ -206,16 +195,22 @@
   <div class="main" id="main-area">
     <div class="status-bar">
       <span class="status-text" id="status-text">Bereit</span>
-      <span class="status-hint" id="status-hint">Neuen Song anlegen oder Song aus der Liste wählen</span>
+      <span class="status-hint" id="status-hint">Song auswählen oder anlegen</span>
     </div>
     <div class="keyboards-container" id="keyboards-container"></div>
   </div>
 </div>
 
+<!-- EXPORT OVERLAY -->
+<div id="export-overlay">
+  <div style="display:flex;gap:10px">
+    <button class="btn-success" onclick="downloadPNG()">⬇ PNG herunterladen</button>
+    <button class="btn-ghost" onclick="closeExport()">Schließen</button>
+  </div>
+  <canvas id="export-canvas"></canvas>
+</div>
+
 <script>
-// ================================================================
-// CONSTANTS
-// ================================================================
 const COLORS=['#7c5cfc','#fc5c7d','#5cf8a0','#fcd05c','#5cb8fc','#fc8a5c','#c45cfc','#fc5cb0','#a0fc5c','#5cfcf8'];
 const KB_START={49:36,61:36,73:28,76:28,88:21};
 const NOTE_NAMES=['C','C#','D','D#','E','F','F#','G','G#','A','A#','B'];
@@ -226,239 +221,147 @@ function noteName(m){return NOTE_NAMES[m%12]+(Math.floor(m/12)-1);}
 function isBlack(m){return[1,3,6,8,10].includes(m%12);}
 function deepClone(o){return JSON.parse(JSON.stringify(o));}
 
-// ================================================================
-// STATE
-// ================================================================
-// songs: [{id, name, keyboards:[{size,name,zones:[{id,name,color,start,end}]}]}]
-// activeSongId: id or null
-// dirty: unsaved changes
-
-let songs = [];
-let activeSongId = null;
-
-let S = {
-  kbCount:1,
-  activeKb:0,
+let songs=[];
+let activeSongId=null;
+let S={
+  kbCount:1,activeKb:0,
   keyboards:[{size:88,name:'Keyboard 1',zones:[]}],
-  mode:'idle',
-  selStart:null,selEnd:null,
-  pendingColor:COLORS[0],
-  dragging:false,
-  dirty:false
+  mode:'idle',selStart:null,selEnd:null,
+  pendingColor:COLORS[0],dragging:false,dirty:false
 };
 
-// ================================================================
-// PERSISTENCE
-// ================================================================
-function saveToDisk(){
-  localStorage.setItem(STORAGE_KEY, JSON.stringify(songs));
-}
-function loadFromDisk(){
-  try{
-    const raw=localStorage.getItem(STORAGE_KEY);
-    if(raw) songs=JSON.parse(raw);
-  }catch(e){songs=[];}
-}
+// ---- PERSISTENCE ----
+function saveToDisk(){localStorage.setItem(STORAGE_KEY,JSON.stringify(songs));}
+function loadFromDisk(){try{const r=localStorage.getItem(STORAGE_KEY);if(r)songs=JSON.parse(r);}catch(e){songs=[];}}
 
-// ================================================================
-// SONG MANAGEMENT
-// ================================================================
+// ---- SONG MANAGEMENT ----
 function newSong(){
-  const name=`Song ${songs.length+1}`;
   const id=Date.now();
-  const song={
-    id,
-    name,
-    keyboards:deepClone(S.keyboards.map((kb,i)=>({size:kb.size,name:kb.name,zones:[]})))
-  };
-  // Actually start fresh
-  song.keyboards=[{size:88,name:'Keyboard 1',zones:[]}];
-  songs.push(song);
-  saveToDisk();
-  loadSong(id);
-  renderSongList();
-  // Immediately rename
+  songs.push({id,name:`Song ${songs.length+1}`,keyboards:[{size:88,name:'Keyboard 1',zones:[]}]});
+  saveToDisk();loadSong(id);renderSongList();
   setTimeout(()=>startRenameSong(id),50);
 }
-
 function loadSong(id){
-  // Save current state back to active song first
-  if(activeSongId!==null) flushToActiveSong();
-
-  const song=songs.find(s=>s.id===id);
-  if(!song)return;
+  if(activeSongId!==null)flushToActiveSong();
+  const song=songs.find(s=>s.id===id);if(!song)return;
   activeSongId=id;
-  // Load into working state
-  const kbs=deepClone(song.keyboards);
-  S.keyboards=kbs;
-  S.kbCount=kbs.length;
-  S.activeKb=0;
+  S.keyboards=deepClone(song.keyboards);
+  S.kbCount=S.keyboards.length;S.activeKb=0;
   S.mode='idle';S.selStart=null;S.selEnd=null;S.dirty=false;
   document.getElementById('new-zone-panel').classList.remove('visible');
   document.getElementById('kb-count-display').textContent=S.kbCount;
   document.getElementById('active-song-label').textContent=song.name;
-  renderSongList();
-  renderKbTabs();
-  renderAllKeyboards();
-  renderZonesList();
-  syncSizeSelect();
-  setStatus(`Song geladen: ${song.name}`,'Zonen bearbeiten oder + Zone klicken');
+  renderSongList();renderAllKeyboards();renderZonesList();syncSizeSelect();
+  setStatus(`${song.name}`,`${S.kbCount} Keyboard(s) — Keyboard anklicken zum Aktivieren`);
   markClean();
 }
-
 function flushToActiveSong(){
   const song=songs.find(s=>s.id===activeSongId);
-  if(!song)return;
-  song.keyboards=deepClone(S.keyboards);
-  saveToDisk();
+  if(song){song.keyboards=deepClone(S.keyboards);saveToDisk();}
 }
-
 function saveCurrentSong(){
-  if(activeSongId===null){
-    newSong();return;
-  }
-  flushToActiveSong();
-  markClean();
+  if(activeSongId===null){newSong();return;}
+  flushToActiveSong();markClean();
   setStatus('✓ Gespeichert','');
   const btn=document.getElementById('btn-save');
-  btn.classList.add('saved');
-  setTimeout(()=>btn.classList.remove('saved'),1500);
+  btn.style.background='var(--green)';btn.style.color='white';
+  setTimeout(()=>{btn.style.background='';btn.style.color='var(--green)';},1200);
 }
-
 function deleteSong(id,e){
   e.stopPropagation();
-  const song=songs.find(s=>s.id===id);
-  if(!song)return;
-  if(!confirm(`Song "${song.name}" löschen?`))return;
-  songs=songs.filter(s=>s.id!==id);
-  saveToDisk();
+  const song=songs.find(s=>s.id===id);if(!song)return;
+  if(!confirm(`"${song.name}" löschen?`))return;
+  songs=songs.filter(s=>s.id!==id);saveToDisk();
   if(activeSongId===id){
     activeSongId=null;
-    S.keyboards=[{size:88,name:'Keyboard 1',zones:[]}];
-    S.kbCount=1;S.activeKb=0;
+    S.keyboards=[{size:88,name:'Keyboard 1',zones:[]}];S.kbCount=1;S.activeKb=0;
     document.getElementById('kb-count-display').textContent=1;
-    document.getElementById('active-song-label').textContent='Kein Song geladen';
-    renderKbTabs();renderAllKeyboards();renderZonesList();syncSizeSelect();
-    setStatus('Bereit','Neuen Song anlegen oder Song aus der Liste wählen');
+    document.getElementById('active-song-label').textContent='Kein Song';
+    renderAllKeyboards();renderZonesList();syncSizeSelect();
+    setStatus('Bereit','Song auswählen oder anlegen');
   }
   renderSongList();
 }
-
 function startRenameSong(id){
-  const el=document.getElementById(`song-name-${id}`);
-  if(!el)return;
-  const song=songs.find(s=>s.id===id);
-  if(!song)return;
-  el.innerHTML=`<input class="rename-input" id="song-rename-${id}" value="${song.name}" style="width:110px;font-size:11px;" onblur="finishRenameSong(${id})" onkeydown="if(event.key==='Enter')this.blur();if(event.key==='Escape'){this.dataset.cancel='1';this.blur();}">`;
-  const inp=document.getElementById(`song-rename-${id}`);
-  inp.focus();inp.select();
+  const el=document.getElementById(`song-name-${id}`);if(!el)return;
+  const song=songs.find(s=>s.id===id);if(!song)return;
+  el.innerHTML=`<input class="rename-input" id="song-rename-${id}" value="${song.name}" style="width:100px;font-size:11px;" onblur="finishRenameSong(${id})" onkeydown="if(event.key==='Enter')this.blur();if(event.key==='Escape'){this.dataset.cancel='1';this.blur();}">`;
+  const inp=document.getElementById(`song-rename-${id}`);inp.focus();inp.select();
 }
-
 function finishRenameSong(id){
-  const inp=document.getElementById(`song-rename-${id}`);
-  if(!inp)return;
-  if(inp.dataset.cancel){renderSongList();return;}
-  const val=inp.value.trim();
-  const song=songs.find(s=>s.id===id);
-  if(song&&val){
-    song.name=val;
-    saveToDisk();
-    if(activeSongId===id) document.getElementById('active-song-label').textContent=val;
+  const inp=document.getElementById(`song-rename-${id}`);if(!inp)return;
+  if(!inp.dataset.cancel){
+    const val=inp.value.trim();const song=songs.find(s=>s.id===id);
+    if(song&&val){song.name=val;saveToDisk();if(activeSongId===id)document.getElementById('active-song-label').textContent=val;}
   }
   renderSongList();
 }
 
-// ================================================================
-// RENDER SONG LIST
-// ================================================================
+// ---- SONG LIST ----
 function renderSongList(){
   const el=document.getElementById('song-list');
-  if(!songs.length){
-    el.innerHTML='<div class="empty-hint">Noch keine Songs.<br>+ Neuer Song klicken.</div>';
-    return;
-  }
+  if(!songs.length){el.innerHTML='<div class="empty-hint">Noch keine Songs.</div>';return;}
   el.innerHTML=songs.map((song,i)=>`
-    <div class="song-item ${song.id===activeSongId?'active':''}" 
-         draggable="true" data-song-id="${song.id}"
-         onclick="loadSong(${song.id})">
-      <span class="drag-handle" onclick="event.stopPropagation()" title="Verschieben">⠿</span>
+    <div class="song-item ${song.id===activeSongId?'active':''}" draggable="true" data-song-id="${song.id}" onclick="loadSong(${song.id})">
+      <span class="drag-handle" onclick="event.stopPropagation()">⠿</span>
       <span class="song-num">${i+1}</span>
       <span class="song-item-name" id="song-name-${song.id}" ondblclick="startRenameSong(${song.id});event.stopPropagation()">${song.name}</span>
-      <span class="song-item-actions">
-        <button class="btn-danger" onclick="deleteSong(${song.id},event)" style="padding:2px 6px;font-size:10px">✕</button>
-      </span>
+      <span class="song-item-actions"><button class="btn-danger" onclick="deleteSong(${song.id},event)" style="padding:2px 5px;font-size:10px">✕</button></span>
     </div>`).join('');
   bindSongDrag();
 }
 
-// ================================================================
-// DRAG & DROP SONG REORDER
-// ================================================================
-let dragSrcId = null;
-
+// ---- DRAG & DROP ----
+let dragSrcId=null;
 function bindSongDrag(){
-  const list = document.getElementById('song-list');
-  list.querySelectorAll('.song-item[draggable]').forEach(item => {
-    item.addEventListener('dragstart', e => {
-      dragSrcId = parseInt(item.dataset.songId);
-      item.classList.add('dragging');
-      e.dataTransfer.effectAllowed = 'move';
+  const list=document.getElementById('song-list');
+  list.querySelectorAll('.song-item[draggable]').forEach(item=>{
+    item.addEventListener('dragstart',e=>{dragSrcId=parseInt(item.dataset.songId);item.classList.add('dragging');e.dataTransfer.effectAllowed='move';});
+    item.addEventListener('dragend',()=>{list.querySelectorAll('.song-item').forEach(el=>el.classList.remove('dragging','drag-over-top','drag-over-bottom'));dragSrcId=null;});
+    item.addEventListener('dragover',e=>{
+      e.preventDefault();if(dragSrcId===parseInt(item.dataset.songId))return;
+      const mid=item.getBoundingClientRect().top+item.getBoundingClientRect().height/2;
+      list.querySelectorAll('.song-item').forEach(el=>el.classList.remove('drag-over-top','drag-over-bottom'));
+      item.classList.add(e.clientY<mid?'drag-over-top':'drag-over-bottom');
     });
-    item.addEventListener('dragend', () => {
-      list.querySelectorAll('.song-item').forEach(el => {
-        el.classList.remove('dragging','drag-over-top','drag-over-bottom');
-      });
-      dragSrcId = null;
-    });
-    item.addEventListener('dragover', e => {
-      e.preventDefault();
-      if(dragSrcId === parseInt(item.dataset.songId)) return;
-      const rect = item.getBoundingClientRect();
-      list.querySelectorAll('.song-item').forEach(el => el.classList.remove('drag-over-top','drag-over-bottom'));
-      item.classList.add(e.clientY < rect.top + rect.height / 2 ? 'drag-over-top' : 'drag-over-bottom');
-    });
-    item.addEventListener('dragleave', () => {
-      item.classList.remove('drag-over-top','drag-over-bottom');
-    });
-    item.addEventListener('drop', e => {
-      e.preventDefault();
-      if(dragSrcId === null) return;
-      const targetId = parseInt(item.dataset.songId);
-      if(dragSrcId === targetId) return;
-      const insertBefore = e.clientY < item.getBoundingClientRect().top + item.getBoundingClientRect().height / 2;
-      const srcIdx = songs.findIndex(s => s.id === dragSrcId);
-      const [moved] = songs.splice(srcIdx, 1);
-      const newTgt = songs.findIndex(s => s.id === targetId);
-      songs.splice(insertBefore ? newTgt : newTgt + 1, 0, moved);
-      saveToDisk();
-      renderSongList();
+    item.addEventListener('dragleave',()=>item.classList.remove('drag-over-top','drag-over-bottom'));
+    item.addEventListener('drop',e=>{
+      e.preventDefault();if(dragSrcId===null)return;
+      const targetId=parseInt(item.dataset.songId);if(dragSrcId===targetId)return;
+      const before=e.clientY<item.getBoundingClientRect().top+item.getBoundingClientRect().height/2;
+      const si=songs.findIndex(s=>s.id===dragSrcId);
+      const[moved]=songs.splice(si,1);
+      const ti=songs.findIndex(s=>s.id===targetId);
+      songs.splice(before?ti:ti+1,0,moved);
+      saveToDisk();renderSongList();
     });
   });
 }
 
-// ================================================================
-// KEYBOARD LAYOUT + RENDER
-// ================================================================
+// ---- KEYBOARD LAYOUT ----
 function buildLayout(size){
   const start=KB_START[size],whiteX={};let wx=0;
   for(let i=0;i<size;i++){const m=start+i;if(!isBlack(m)){whiteX[m]=wx;wx+=WW;}}
   const keys=[];
   for(let i=0;i<size;i++){const m=start+i;if(!isBlack(m))keys.push({m,black:false,x:whiteX[m],y:0,w:WW,h:WH});}
   for(let i=0;i<size;i++){const m=start+i;if(isBlack(m)&&whiteX[m-1]!==undefined)keys.push({m,black:true,x:whiteX[m-1]+WW-BW/2-1,y:0,w:BW,h:BH});}
-  return{keys,totalW:wx};
+  return{keys,totalW:wx,whiteX};
 }
 
+// ---- RENDER SVG ----
 function renderKbSVG(kbIdx){
   const kb=S.keyboards[kbIdx];
-  const{keys,totalW}=buildLayout(kb.size);
-  const W=totalW+2,H=WH+4;
+  const{keys,totalW,whiteX}=buildLayout(kb.size);
+  const W=totalW+2,H=WH+32; // extra height for zone labels
   const isActive=kbIdx===S.activeKb;
   let svg=`<svg class="keyboard" viewBox="0 0 ${W} ${H}" width="${W}" height="${H}" xmlns="http://www.w3.org/2000/svg">`;
+
   const whites=keys.filter(k=>!k.black),blacks=keys.filter(k=>k.black);
   function zoneColor(m){let c=null;kb.zones.forEach(z=>{if(m>=z.start&&m<=z.end)c=z.color;});return c;}
   const selMin=S.selStart!==null?Math.min(S.selStart,S.selEnd??S.selStart):null;
   const selMax=S.selStart!==null?Math.max(S.selStart,S.selEnd??S.selStart):null;
-  const inSel=(m)=>isActive&&S.mode==='selecting'&&selMin!==null&&m>=selMin&&m<=selMax;
+  const inSel=m=>isActive&&S.mode==='selecting'&&selMin!==null&&m>=selMin&&m<=selMax;
+
   whites.forEach(k=>{
     const zc=zoneColor(k.m),sel=inSel(k.m);
     svg+=`<rect class="white-key" data-m="${k.m}" x="${k.x+1}" y="1" width="${k.w-1}" height="${k.h}" rx="2"/>`;
@@ -471,6 +374,21 @@ function renderKbSVG(kbIdx){
     if(zc)svg+=`<rect class="zone-overlay" x="${k.x}" y="0" width="${k.w}" height="${k.h}" rx="2" fill="${zc}"/>`;
     if(sel)svg+=`<rect class="select-overlay" x="${k.x}" y="0" width="${k.w}" height="${k.h}" rx="2" fill="#aaaaff"/>`;
   });
+
+  // Zone labels below keyboard
+  const labelY=WH+8;
+  kb.zones.forEach(z=>{
+    // find x positions of start and end keys
+    const startKey=keys.find(k=>k.m===z.start)||keys.reduce((a,b)=>Math.abs(b.m-z.start)<Math.abs(a.m-z.start)?b:a);
+    const endKey=keys.find(k=>k.m===z.end)||keys.reduce((a,b)=>Math.abs(b.m-z.end)<Math.abs(a.m-z.end)?b:a);
+    const x1=startKey.black?startKey.x:startKey.x+1;
+    const x2=endKey.black?endKey.x+endKey.w:endKey.x+endKey.w;
+    const cx=(x1+x2)/2;
+    const barW=x2-x1;
+    svg+=`<rect x="${x1}" y="${WH+3}" width="${barW}" height="5" rx="2" fill="${z.color}" opacity="0.9"/>`;
+    svg+=`<text x="${cx}" y="${labelY+14}" text-anchor="middle" font-family="sans-serif" font-size="9" font-weight="700" fill="${z.color}">${z.name}</text>`;
+  });
+
   svg+=`</svg>`;return svg;
 }
 
@@ -479,11 +397,19 @@ function renderAllKeyboards(){
   container.innerHTML='';
   S.keyboards.forEach((kb,i)=>{
     const div=document.createElement('div');
-    div.className='keyboard-block';div.id=`kb-block-${i}`;
-    div.innerHTML=`<div class="keyboard-block-header"><span class="keyboard-title" id="kb-title-${i}" ondblclick="startRenameKb(${i})" title="Doppelklick zum Umbenennen">${kb.name}</span></div><div class="keyboard-wrapper"><div class="keyboard-svg-container" id="kb-svg-${i}">${renderKbSVG(i)}</div></div>`;
+    div.className=`keyboard-block${i===S.activeKb?' active-kb':''}`;
+    div.id=`kb-block-${i}`;
+    div.onclick=e=>{if(!e.target.closest('input'))setActiveKb(i);};
+    div.innerHTML=`
+      <div class="keyboard-block-header">
+        <span class="keyboard-title" id="kb-title-${i}" ondblclick="startRenameKb(${i});event.stopPropagation()" title="Doppelklick zum Umbenennen">${kb.name}</span>
+        ${i===S.activeKb?'<span class="active-kb-badge">AKTIV</span>':''}
+      </div>
+      <div class="keyboard-wrapper"><div class="keyboard-svg-container" id="kb-svg-${i}">${renderKbSVG(i)}</div></div>`;
     container.appendChild(div);
   });
   bindEvents();
+  updateActiveKbDisplay();
 }
 
 function refreshKb(idx){
@@ -491,9 +417,7 @@ function refreshKb(idx){
   if(el)el.innerHTML=renderKbSVG(idx);
 }
 
-// ================================================================
-// EVENTS
-// ================================================================
+// ---- EVENTS ----
 function bindEvents(){
   const container=document.getElementById('keyboards-container');
   container.addEventListener('mousedown',evDown);
@@ -512,33 +436,30 @@ function evTouchStart(e){if(S.mode!=='selecting')return;e.preventDefault();const
 function evTouchMove(e){if(S.mode!=='selecting'||!S.dragging)return;e.preventDefault();const m=midiFromTouch(e);if(m!==null){S.selEnd=m;updateRangeBadge();refreshKb(S.activeKb);}}
 function evTouchEnd(e){if(S.mode!=='selecting')return;S.dragging=false;const m=midiFromTouch(e);if(m!==null){S.selEnd=m;updateRangeBadge();refreshKb(S.activeKb);}}
 
-// ================================================================
-// ZONE FLOW
-// ================================================================
+// ---- ZONE FLOW ----
 function startZoneSelection(){
-  if(activeSongId===null){setStatus('⚠ Erst Song auswählen','+ Neuer Song in der linken Liste');return;}
+  if(activeSongId===null){setStatus('⚠ Erst Song auswählen','');return;}
   S.mode='selecting';S.selStart=null;S.selEnd=null;S.dragging=false;
   document.getElementById('new-zone-panel').classList.add('visible');
   document.getElementById('zone-name-input').value='';
   document.getElementById(`kb-block-${S.activeKb}`)?.classList.add('active-selection');
   renderColorPicker();updateRangeBadge();
-  setStatus('Zone definieren','Tasten auf der Tastatur antippen / ziehen');
+  setStatus('Zone definieren','Tasten ziehen, dann Name eingeben');
   refreshKb(S.activeKb);
 }
 function cancelZoneSelection(){
   S.mode='idle';S.selStart=null;S.selEnd=null;S.dragging=false;
   document.getElementById('new-zone-panel').classList.remove('visible');
   document.querySelectorAll('.keyboard-block').forEach(el=>el.classList.remove('active-selection'));
-  setStatus('Bereit','Zonen bearbeiten oder speichern');refreshKb(S.activeKb);
+  setStatus('Bereit','');refreshKb(S.activeKb);
 }
 function saveZone(){
   const name=document.getElementById('zone-name-input').value.trim();
   if(!name){document.getElementById('zone-name-input').focus();return;}
-  if(S.selStart===null||S.selEnd===null){setStatus('⚠ Erst Tasten wählen','Tastatur antippen und ziehen');return;}
+  if(S.selStart===null||S.selEnd===null){setStatus('⚠ Erst Tasten wählen','');return;}
   const s=Math.min(S.selStart,S.selEnd),e=Math.max(S.selStart,S.selEnd);
   S.keyboards[S.activeKb].zones.push({id:Date.now(),name,color:S.pendingColor,start:s,end:e});
-  markDirty();
-  cancelZoneSelection();renderZonesList();refreshKb(S.activeKb);
+  markDirty();cancelZoneSelection();renderZonesList();refreshKb(S.activeKb);
   setStatus(`✓ Zone "${name}" hinzugefügt`,'Vergiss nicht zu speichern!');
 }
 function deleteZone(id){
@@ -552,66 +473,55 @@ function updateRangeBadge(){
   el.textContent=`${noteName(s)}  →  ${noteName(e2)}`;
 }
 
-// ================================================================
-// ZONES LIST
-// ================================================================
+// ---- ZONES LIST ----
 function renderZonesList(){
   document.getElementById('zone-kb-label').textContent=S.keyboards[S.activeKb]?.name||'';
   const zones=S.keyboards[S.activeKb]?.zones||[];
   const el=document.getElementById('zones-list');
-  if(!zones.length){el.innerHTML='<div class="empty-hint">Noch keine Zonen.<br>+ Zone klicken, dann Tasten markieren.</div>';return;}
+  if(!zones.length){el.innerHTML='<div class="empty-hint">Noch keine Zonen.<br>+ Zone klicken.</div>';return;}
   el.innerHTML=zones.map(z=>`<div class="zone-item"><div class="zone-color-dot" style="background:${z.color}"></div><div class="zone-info"><div class="zone-name">${z.name}</div><div class="zone-range">${noteName(z.start)} – ${noteName(z.end)}</div></div><button class="btn-danger" onclick="deleteZone(${z.id})">✕</button></div>`).join('');
 }
 
-// ================================================================
-// COLOR
-// ================================================================
+// ---- COLOR ----
 function renderColorPicker(){
   document.getElementById('color-picker').innerHTML=COLORS.map(c=>`<div class="color-swatch ${c===S.pendingColor?'selected':''}" style="background:${c}" onclick="pickColor('${c}')"></div>`).join('');
 }
 function pickColor(c){S.pendingColor=c;renderColorPicker();}
 
-// ================================================================
-// KB COUNT / TABS
-// ================================================================
+// ---- KB COUNT / ACTIVE ----
 function changeKbCount(d){
   const n=Math.max(1,Math.min(3,S.kbCount+d));if(n===S.kbCount)return;
   if(n>S.kbCount)S.keyboards.push({size:88,name:`Keyboard ${n}`,zones:[]});
   else{S.keyboards.pop();if(S.activeKb>=n)S.activeKb=n-1;}
   S.kbCount=n;document.getElementById('kb-count-display').textContent=n;
-  markDirty();renderKbTabs();renderAllKeyboards();renderZonesList();syncSizeSelect();
-}
-function renderKbTabs(){
-  document.getElementById('kb-tabs').innerHTML=S.keyboards.map((kb,i)=>`<button class="btn-small ${i===S.activeKb?'active':''}" onclick="setActiveKb(${i})">${kb.name}</button>`).join('');
+  markDirty();renderAllKeyboards();renderZonesList();syncSizeSelect();
 }
 function setActiveKb(i){
-  S.activeKb=i;renderKbTabs();renderZonesList();syncSizeSelect();
+  S.activeKb=i;
   if(S.mode==='selecting')cancelZoneSelection();
+  renderAllKeyboards();renderZonesList();syncSizeSelect();
+}
+function updateActiveKbDisplay(){
+  document.getElementById('active-kb-name').textContent=S.keyboards[S.activeKb]?.name||'—';
+  document.getElementById('key-size-select').value=S.keyboards[S.activeKb]?.size||88;
 }
 function syncSizeSelect(){document.getElementById('key-size-select').value=S.keyboards[S.activeKb]?.size||88;}
 function onKeySizeChange(){S.keyboards[S.activeKb].size=parseInt(document.getElementById('key-size-select').value);markDirty();refreshKb(S.activeKb);}
 
-// ================================================================
-// KB RENAME
-// ================================================================
+// ---- KB RENAME ----
 function startRenameKb(i){
   const el=document.getElementById(`kb-title-${i}`);if(!el)return;
-  const current=S.keyboards[i].name;
-  el.innerHTML=`<input class="rename-input" id="kb-rename-input-${i}" value="${current}" onblur="finishRenameKb(${i})" onkeydown="if(event.key==='Enter')this.blur();if(event.key==='Escape'){this.dataset.cancel='1';this.blur();}">`;
-  const inp=document.getElementById(`kb-rename-input-${i}`);inp.focus();inp.select();
+  const cur=S.keyboards[i].name;
+  el.innerHTML=`<input class="rename-input" id="kb-rename-${i}" value="${cur}" onblur="finishRenameKb(${i})" onkeydown="if(event.key==='Enter')this.blur();if(event.key==='Escape'){this.dataset.cancel='1';this.blur();}">`;
+  const inp=document.getElementById(`kb-rename-${i}`);inp.focus();inp.select();
 }
 function finishRenameKb(i){
-  const inp=document.getElementById(`kb-rename-input-${i}`);if(!inp)return;
-  if(!inp.dataset.cancel){
-    const val=inp.value.trim()||S.keyboards[i].name;
-    S.keyboards[i].name=val;markDirty();
-  }
-  renderAllKeyboards();renderKbTabs();renderZonesList();
+  const inp=document.getElementById(`kb-rename-${i}`);if(!inp)return;
+  if(!inp.dataset.cancel){S.keyboards[i].name=inp.value.trim()||S.keyboards[i].name;markDirty();}
+  renderAllKeyboards();renderZonesList();
 }
 
-// ================================================================
-// DIRTY STATE
-// ================================================================
+// ---- DIRTY ----
 function markDirty(){
   S.dirty=true;
   const btn=document.getElementById('btn-save');
@@ -623,22 +533,128 @@ function markClean(){
   btn.textContent='💾 Speichern';btn.style.color='var(--green)';btn.style.borderColor='var(--green)';
 }
 
-// ================================================================
-// UTILS
-// ================================================================
+// ---- EXPORT PNG ----
+function exportPNG(){
+  if(activeSongId===null){setStatus('⚠ Erst Song auswählen','');return;}
+  const song=songs.find(s=>s.id===activeSongId);
+  const kbs=S.keyboards;
+
+  // Build export canvas manually
+  const SCALE=2;
+  const PAD=20;
+  const KB_GAP=20;
+  const TITLE_H=36;
+
+  // Calculate total size
+  let maxKbW=0;
+  const kbLayouts=kbs.map(kb=>{
+    const{totalW}=buildLayout(kb.size);
+    if(totalW>maxKbW)maxKbW=totalW;
+    return totalW;
+  });
+  const totalH=TITLE_H + PAD + kbs.length*(WH+32+KB_GAP) + PAD;
+  const totalW=maxKbW + PAD*2;
+
+  const canvas=document.getElementById('export-canvas');
+  canvas.width=totalW*SCALE;
+  canvas.height=totalH*SCALE;
+  const ctx=canvas.getContext('2d');
+  ctx.scale(SCALE,SCALE);
+
+  // Background
+  ctx.fillStyle='#16161e';
+  ctx.fillRect(0,0,totalW,totalH);
+
+  // Title
+  ctx.fillStyle='#f0f0f5';
+  ctx.font='bold 18px Syne, sans-serif';
+  ctx.textAlign='left';
+  ctx.fillText(song.name,PAD,PAD+16);
+  ctx.fillStyle='#6b6b85';
+  ctx.font='11px Space Mono, monospace';
+  ctx.fillText(`KeySplit — ${kbs.length} Keyboard(s)`,PAD,PAD+30);
+
+  let y=TITLE_H+PAD;
+
+  kbs.forEach((kb,ki)=>{
+    const{keys,totalW:kbW}=buildLayout(kb.size);
+    const whites=keys.filter(k=>!k.black),blacks=keys.filter(k=>k.black);
+    const x0=PAD;
+
+    // KB label
+    ctx.fillStyle='#6b6b85';
+    ctx.font='bold 10px Syne, sans-serif';
+    ctx.textAlign='left';
+    ctx.fillText(kb.name.toUpperCase(),x0,y-4);
+
+    function zoneColor(m){let c=null;kb.zones.forEach(z=>{if(m>=z.start&&m<=z.end)c=z.color;});return c;}
+
+    // White keys
+    whites.forEach(k=>{
+      ctx.fillStyle='#e8e8f0';ctx.strokeStyle='#aaaabc';ctx.lineWidth=1;
+      roundRect(ctx,x0+k.x+1,y+1,k.w-1,k.h,2,true,true);
+      const zc=zoneColor(k.m);
+      if(zc){ctx.globalAlpha=0.5;ctx.fillStyle=zc;roundRect(ctx,x0+k.x+1,y+1,k.w-1,k.h,2,true,false);ctx.globalAlpha=1;}
+    });
+    // Black keys
+    blacks.forEach(k=>{
+      ctx.fillStyle='#1c1c28';ctx.strokeStyle='#0a0a14';ctx.lineWidth=0.5;
+      roundRect(ctx,x0+k.x,y,k.w,k.h,2,true,true);
+      const zc=zoneColor(k.m);
+      if(zc){ctx.globalAlpha=0.5;ctx.fillStyle=zc;roundRect(ctx,x0+k.x,y,k.w,k.h,2,true,false);ctx.globalAlpha=1;}
+    });
+
+    // Zone labels
+    kb.zones.forEach(z=>{
+      const startKey=keys.find(k=>k.m===z.start)||keys.reduce((a,b)=>Math.abs(b.m-z.start)<Math.abs(a.m-z.start)?b:a);
+      const endKey=keys.find(k=>k.m===z.end)||keys.reduce((a,b)=>Math.abs(b.m-z.end)<Math.abs(a.m-z.end)?b:a);
+      const x1=x0+(startKey.black?startKey.x:startKey.x+1);
+      const x2=x0+(endKey.black?endKey.x+endKey.w:endKey.x+endKey.w);
+      const barW=x2-x1;
+      const cx=(x1+x2)/2;
+      // Color bar
+      ctx.fillStyle=z.color;ctx.globalAlpha=0.9;
+      roundRect(ctx,x1,y+WH+3,barW,5,2,true,false);ctx.globalAlpha=1;
+      // Label
+      ctx.fillStyle=z.color;
+      ctx.font='bold 9px sans-serif';ctx.textAlign='center';
+      ctx.fillText(z.name,cx,y+WH+22);
+    });
+
+    y+=WH+32+KB_GAP;
+  });
+
+  document.getElementById('export-overlay').classList.add('open');
+}
+
+function roundRect(ctx,x,y,w,h,r,fill,stroke){
+  ctx.beginPath();
+  ctx.moveTo(x+r,y);ctx.lineTo(x+w-r,y);ctx.arcTo(x+w,y,x+w,y+r,r);
+  ctx.lineTo(x+w,y+h-r);ctx.arcTo(x+w,y+h,x+w-r,y+h,r);
+  ctx.lineTo(x+r,y+h);ctx.arcTo(x,y+h,x,y+h-r,r);
+  ctx.lineTo(x,y+r);ctx.arcTo(x,y,x+r,y,r);ctx.closePath();
+  if(fill)ctx.fill();if(stroke)ctx.stroke();
+}
+
+function downloadPNG(){
+  const song=songs.find(s=>s.id===activeSongId);
+  const name=song?song.name.replace(/[^a-z0-9]/gi,'_'):'keysplit';
+  const canvas=document.getElementById('export-canvas');
+  const a=document.createElement('a');
+  a.download=`${name}.png`;a.href=canvas.toDataURL('image/png');a.click();
+}
+function closeExport(){document.getElementById('export-overlay').classList.remove('open');}
+
+// ---- UTILS ----
 function setStatus(t,h){document.getElementById('status-text').textContent=t;document.getElementById('status-hint').textContent=h;}
 
-// ================================================================
-// INIT
-// ================================================================
+// ---- INIT ----
 loadFromDisk();
 renderSongList();
-renderKbTabs();
 renderAllKeyboards();
 renderZonesList();
-setStatus('Bereit','Neuen Song anlegen oder Song aus der Liste wählen');
+setStatus('Bereit','Song auswählen oder anlegen');
 
-// Auto-save on page hide
 window.addEventListener('visibilitychange',()=>{if(document.hidden&&activeSongId!==null)flushToActiveSong();});
 window.addEventListener('beforeunload',()=>{if(activeSongId!==null)flushToActiveSong();});
 </script>
