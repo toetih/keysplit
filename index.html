@@ -510,14 +510,6 @@ function renderKbSVG(kbIdx){
     svg+=`<text x="${cx}" y="${textY}" text-anchor="middle" font-family="sans-serif" font-size="9" font-weight="700" fill="${z.color}">${z.name}</text>`;
   });
 
-  // Draw C4 reference line (MIDI 60)
-  const c4Key = keys.find(k=>k.m===60);
-  if(c4Key){
-    const c4x = c4Key.black ? c4Key.x + c4Key.w/2 : c4Key.x + c4Key.w/2;
-    svg+=`<line x1="${c4x}" y1="0" x2="${c4x}" y2="${H}" stroke="#fcd05c" stroke-width="1.5" stroke-dasharray="4,3" opacity="0.7" pointer-events="none"/>`;
-    svg+=`<text x="${c4x+3}" y="10" font-family="sans-serif" font-size="8" font-weight="700" fill="#fcd05c" opacity="0.8" pointer-events="none">C4</text>`;
-  }
-
   // Draw handles on zone edges (only when not in selecting mode)
   if(S.mode==='idle' || S.mode==='handle'){
     kb.zones.forEach(z=>{
