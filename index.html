@@ -540,10 +540,23 @@ function renderKbSVG(kbIdx){
   svg+=`</svg>`;return svg;
 }
 
+function getC4Offset(size){
+  // Returns x-position of the left edge of C4 (MIDI 60) for a given keyboard size
+  const {keys} = buildLayout(size);
+  const c4 = keys.find(k=>k.m===60);
+  return c4 ? c4.x : 0;
+}
+
 function renderAllKeyboards(){
   const container=document.getElementById('keyboards-container');
   container.innerHTML='';
+
+  // Calculate C4 alignment offsets
+  const c4Offsets = S.keyboards.map(kb=>getC4Offset(kb.size));
+  const maxC4Offset = Math.max(...c4Offsets);
+
   S.keyboards.forEach((kb,i)=>{
+    const paddingLeft = maxC4Offset - c4Offsets[i];
     const div=document.createElement('div');
     div.className=`keyboard-block${i===S.activeKb?' active-kb':''}`;
     div.id=`kb-block-${i}`;
@@ -553,10 +566,10 @@ function renderAllKeyboards(){
         <span class="keyboard-title" id="kb-title-${i}" ondblclick="startRenameKb(${i});event.stopPropagation()" title="Doppelklick zum Umbenennen">${kb.name}</span>
         <div style="display:flex;align-items:center;gap:7px">
           ${i===S.activeKb?'<span class="active-kb-badge">AKTIV</span>':''}
-          ${S.keyboards.length>1&&i<S.keyboards.length-1?`<button onclick="swapKeyboards(${i},${i+1});event.stopPropagation()" title="Mit nächstem Keyboard tauschen" style="background:transparent;border:1px solid var(--border);color:var(--text-muted);border-radius:5px;padding:2px 7px;font-size:12px;cursor:pointer;line-height:1.4" onmouseover="this.style.borderColor='var(--accent)';this.style.color='var(--accent)'" onmouseout="this.style.borderColor='var(--border)';this.style.color='var(--text-muted)'">⇅</button>`:''}
+          ${S.keyboards.length>1&&i<S.keyboards.length-1?`<button onclick="swapKeyboards(${i},${i+1});event.stopPropagation()" title="Mit nächstem Keyboard tauschen" style="background:transparent;border:1px solid var(--border);color:var(--text-muted);border-radius:5px;padding:2px 8px;font-size:22px;cursor:pointer;line-height:1" onmouseover="this.style.borderColor='var(--accent)';this.style.color='var(--accent)'" onmouseout="this.style.borderColor='var(--border)';this.style.color='var(--text-muted)'">⇅</button>`:''}
         </div>
       </div>
-      <div class="keyboard-wrapper"><div class="keyboard-svg-container" id="kb-svg-${i}">${renderKbSVG(i)}</div></div>`;
+      <div class="keyboard-wrapper" style="padding-left:${paddingLeft}px"><div class="keyboard-svg-container" id="kb-svg-${i}">${renderKbSVG(i)}</div></div>`;
     container.appendChild(div);
   });
   bindEvents();
@@ -566,6 +579,13 @@ function renderAllKeyboards(){
 function refreshKb(idx){
   const el=document.getElementById(`kb-svg-${idx}`);
   if(el)el.innerHTML=renderKbSVG(idx);
+  // Re-apply C4 alignment padding
+  const c4Offsets = S.keyboards.map(kb=>getC4Offset(kb.size));
+  const maxC4Offset = Math.max(...c4Offsets);
+  S.keyboards.forEach((_,i)=>{
+    const wrapper=document.querySelector(`#kb-block-${i} .keyboard-wrapper`);
+    if(wrapper)wrapper.style.paddingLeft=(maxC4Offset-c4Offsets[i])+'px';
+  });
 }
 
 // ---- EVENTS ----
