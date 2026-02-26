@@ -209,6 +209,17 @@
     <div class="new-zone-panel" id="new-zone-panel">
       <div class="sidebar-label" style="margin-bottom:0">Neue Zone</div>
       <div class="range-badge" id="range-badge">← Tasten auf Tastatur wählen</div>
+      <div style="display:flex;gap:6px;align-items:center">
+        <div style="flex:1">
+          <div style="font-size:9px;color:var(--text-muted);margin-bottom:3px;font-weight:700;letter-spacing:1px;text-transform:uppercase">Von</div>
+          <input type="text" id="zone-from-input" placeholder="C2" style="width:100%;background:var(--surface2);border:1px solid var(--border);border-radius:8px;color:var(--text);font-family:'Space Mono',monospace;font-size:12px;padding:6px 8px;outline:none" oninput="applyRangeTextInput()" onfocus="this.style.borderColor='var(--accent)'" onblur="this.style.borderColor='var(--border)'">
+        </div>
+        <div style="color:var(--text-muted);font-size:14px;margin-top:14px">–</div>
+        <div style="flex:1">
+          <div style="font-size:9px;color:var(--text-muted);margin-bottom:3px;font-weight:700;letter-spacing:1px;text-transform:uppercase">Bis</div>
+          <input type="text" id="zone-to-input" placeholder="F#3" style="width:100%;background:var(--surface2);border:1px solid var(--border);border-radius:8px;color:var(--text);font-family:'Space Mono',monospace;font-size:12px;padding:6px 8px;outline:none" oninput="applyRangeTextInput()" onfocus="this.style.borderColor='var(--accent)'" onblur="this.style.borderColor='var(--border)'">
+        </div>
+      </div>
       <input type="text" id="zone-name-input" placeholder="Bass, Strings, Lead...">
       <div>
         <div class="sidebar-label" style="margin-bottom:5px">Farbe</div>
@@ -499,6 +510,14 @@ function renderKbSVG(kbIdx){
     svg+=`<text x="${cx}" y="${textY}" text-anchor="middle" font-family="sans-serif" font-size="9" font-weight="700" fill="${z.color}">${z.name}</text>`;
   });
 
+  // Draw C4 reference line (MIDI 60)
+  const c4Key = keys.find(k=>k.m===60);
+  if(c4Key){
+    const c4x = c4Key.black ? c4Key.x + c4Key.w/2 : c4Key.x + c4Key.w/2;
+    svg+=`<line x1="${c4x}" y1="0" x2="${c4x}" y2="${H}" stroke="#fcd05c" stroke-width="1.5" stroke-dasharray="4,3" opacity="0.7" pointer-events="none"/>`;
+    svg+=`<text x="${c4x+3}" y="10" font-family="sans-serif" font-size="8" font-weight="700" fill="#fcd05c" opacity="0.8" pointer-events="none">C4</text>`;
+  }
+
   // Draw handles on zone edges (only when not in selecting mode)
   if(S.mode==='idle' || S.mode==='handle'){
     kb.zones.forEach(z=>{
@@ -532,7 +551,10 @@ function renderAllKeyboards(){
     div.innerHTML=`
       <div class="keyboard-block-header">
         <span class="keyboard-title" id="kb-title-${i}" ondblclick="startRenameKb(${i});event.stopPropagation()" title="Doppelklick zum Umbenennen">${kb.name}</span>
-        ${i===S.activeKb?'<span class="active-kb-badge">AKTIV</span>':''}
+        <div style="display:flex;align-items:center;gap:7px">
+          ${i===S.activeKb?'<span class="active-kb-badge">AKTIV</span>':''}
+          ${S.keyboards.length>1&&i<S.keyboards.length-1?`<button onclick="swapKeyboards(${i},${i+1});event.stopPropagation()" title="Mit nächstem Keyboard tauschen" style="background:transparent;border:1px solid var(--border);color:var(--text-muted);border-radius:5px;padding:2px 7px;font-size:12px;cursor:pointer;line-height:1.4" onmouseover="this.style.borderColor='var(--accent)';this.style.color='var(--accent)'" onmouseout="this.style.borderColor='var(--border)';this.style.color='var(--text-muted)'">⇅</button>`:''}
+        </div>
       </div>
       <div class="keyboard-wrapper"><div class="keyboard-svg-container" id="kb-svg-${i}">${renderKbSVG(i)}</div></div>`;
     container.appendChild(div);
@@ -660,6 +682,8 @@ function startZoneSelection(){
   S.mode='selecting';S.editingZoneId=null;S.selStart=null;S.selEnd=null;S.dragging=false;
   document.getElementById('new-zone-panel').classList.add('visible');
   document.getElementById('zone-name-input').value='';
+  const fi=document.getElementById('zone-from-input');const ti=document.getElementById('zone-to-input');
+  if(fi)fi.value='';if(ti)ti.value='';
   document.getElementById(`kb-block-${S.activeKb}`)?.classList.add('active-selection');
   renderColorPicker();updateRangeBadge();
   setStatus('Zone definieren','Tasten ziehen, dann Name eingeben');
@@ -677,6 +701,8 @@ function startEditRange(kbIdx, zoneId){
   document.getElementById('new-zone-panel').classList.add('visible');
   document.getElementById('zone-name-input').value=zone.name;
   S.pendingColor=zone.color;
+  const fi=document.getElementById('zone-from-input');const ti=document.getElementById('zone-to-input');
+  if(fi)fi.value=noteName(zone.start);if(ti)ti.value=noteName(zone.end);
   document.getElementById(`kb-block-${kbIdx}`)?.classList.add('active-selection');
   renderColorPicker();updateRangeBadge();
   setStatus(`Zone „${zone.name}" bearbeiten`,'Bereich neu auf der Tastatur ziehen');
@@ -718,9 +744,61 @@ function deleteZoneFrom(kbIdx,zoneId){
 }
 function updateRangeBadge(){
   const el=document.getElementById('range-badge');
-  if(S.selStart===null){el.textContent='← Tasten auf Tastatur wählen';return;}
+  if(S.selStart===null){el.textContent='← Tasten auf Tastatur wählen';
+    // Clear text inputs only if they're empty (don't override user typing)
+    const fi=document.getElementById('zone-from-input');
+    const ti=document.getElementById('zone-to-input');
+    if(fi&&!fi.dataset.userTyping)fi.value='';
+    if(ti&&!ti.dataset.userTyping)ti.value='';
+    return;
+  }
   const s=Math.min(S.selStart,S.selEnd??S.selStart),e2=Math.max(S.selStart,S.selEnd??S.selStart);
   el.textContent=`${noteName(s)}  →  ${noteName(e2)}`;
+  // Sync text inputs with current selection
+  const fi=document.getElementById('zone-from-input');
+  const ti=document.getElementById('zone-to-input');
+  if(fi&&!fi.matches(':focus'))fi.value=noteName(s);
+  if(ti&&!ti.matches(':focus'))ti.value=noteName(e2);
+}
+
+// Parse note name like "C2", "F#3", "Bb4" -> MIDI number or null
+function parseNoteInput(str){
+  if(!str)return null;
+  str=str.trim().toUpperCase().replace('B','b');
+  // Accept formats: C4, F#3, Bb2, C#5
+  const m=str.match(/^([A-G][b#]?)(-?\d+)$/);
+  if(!m)return null;
+  const noteMap={'C':0,'C#':1,'Db':1,'D':2,'D#':3,'Eb':3,'E':4,'F':5,'F#':6,'Gb':6,'G':7,'G#':8,'Ab':8,'A':9,'A#':10,'Bb':10,'B':11};
+  const semitone=noteMap[m[1]];
+  if(semitone===undefined)return null;
+  const octave=parseInt(m[2]);
+  const midi=(octave+1)*12+semitone;
+  return (midi>=0&&midi<=127)?midi:null;
+}
+
+function applyRangeTextInput(){
+  const fv=document.getElementById('zone-from-input')?.value||'';
+  const tv=document.getElementById('zone-to-input')?.value||'';
+  const from=parseNoteInput(fv);
+  const to=parseNoteInput(tv);
+  if(from!==null&&to!==null){
+    S.selStart=Math.min(from,to);
+    S.selEnd=Math.max(from,to);
+    // Update badge without overwriting inputs
+    const el=document.getElementById('range-badge');
+    el.textContent=`${noteName(S.selStart)}  →  ${noteName(S.selEnd)}`;
+    refreshKb(S.activeKb);
+  } else if(from!==null){
+    S.selStart=from;S.selEnd=from;
+    const el=document.getElementById('range-badge');
+    el.textContent=`${noteName(from)}  →  …`;
+    refreshKb(S.activeKb);
+  }
+  // Highlight invalid input
+  const fi=document.getElementById('zone-from-input');
+  const ti=document.getElementById('zone-to-input');
+  if(fi)fi.style.borderColor=(fv&&from===null)?'var(--accent2)':'var(--border)';
+  if(ti)ti.style.borderColor=(tv&&to===null)?'var(--accent2)':'var(--border)';
 }
 
 // ---- ZONES LIST ----
@@ -806,7 +884,15 @@ function closeColorPopup(){
   colorPickerTarget = null;
 }
 
-// ---- KB COUNT / ACTIVE ----
+// ---- SWAP KEYBOARDS ----
+function swapKeyboards(a, b){
+  if(a<0||b>=S.keyboards.length)return;
+  [S.keyboards[a],S.keyboards[b]]=[S.keyboards[b],S.keyboards[a]];
+  if(S.activeKb===a)S.activeKb=b;
+  else if(S.activeKb===b)S.activeKb=a;
+  markDirty();renderAllKeyboards();renderZonesList();
+}
+
 function changeKbCount(d){
   const n=Math.max(1,Math.min(3,S.kbCount+d));if(n===S.kbCount)return;
   if(n>S.kbCount)S.keyboards.push({size:88,name:`Keyboard ${n}`,zones:[]});
