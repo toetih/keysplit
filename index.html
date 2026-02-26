@@ -1053,6 +1053,13 @@ function exportPNG(){
     return totalW;
   });
 
+  // C4 alignment offsets (same logic as live view)
+  const c4OffsetsE = kbs.map(kb=>getC4Offset(kb.size));
+  const maxC4OffsetE = Math.max(...c4OffsetsE);
+  const kbPaddingsE = kbs.map((_,i)=>maxC4OffsetE - c4OffsetsE[i]);
+  // Total canvas width must accommodate widest keyboard + its padding
+  const totalExportW = Math.max(...kbs.map((_,i)=>kbLayouts[i]+kbPaddingsE[i])) + PAD*2;
+
   // Pre-calculate max label rows per keyboard
   function calcMaxRows(kb) {
     const{keys}=buildLayout(kb.size);
@@ -1083,7 +1090,7 @@ function exportPNG(){
   const labelRowsPerKb=kbs.map(kb=>calcMaxRows(kb));
   const barRowsPerKb=kbs.map(kb=>calcMaxBarRows(kb));
   const totalH=TITLE_H + PAD + kbs.reduce((sum,kb,i)=>sum+LABEL_H+WH+3+barRowsPerKb[i]*6+4+labelRowsPerKb[i]*LABEL_ROW_H+KB_GAP,0) + PAD;
-  const totalW=maxKbW + PAD*2;
+  const totalW=totalExportW;
 
   const canvas=document.getElementById('export-canvas');
   canvas.width=totalW*SCALE;
@@ -1109,7 +1116,7 @@ function exportPNG(){
   kbs.forEach((kb,ki)=>{
     const{keys,totalW:kbW}=buildLayout(kb.size);
     const whites=keys.filter(k=>!k.black),blacks=keys.filter(k=>k.black);
-    const x0=PAD;
+    const x0=PAD + kbPaddingsE[ki];
 
     // KB label above keyboard
     ctx.fillStyle='#888888';
