@@ -87,7 +87,7 @@
   .keyboard-block-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:10px;}
   .keyboard-title{font-size:12px;font-weight:700;color:var(--text-muted);letter-spacing:1px;cursor:text;}
   .keyboard-block.active-kb .keyboard-title{color:var(--accent);}
-  .keyboard-wrapper{width:100%;overflow-x:auto;}
+  .keyboard-wrapper{width:100%;overflow-x:auto;-webkit-overflow-scrolling:touch;}
   .keyboard-svg-container{display:inline-block;}
   svg.keyboard{display:block;user-select:none;-webkit-user-select:none;touch-action:none;}
   .white-key{fill:var(--white-key);stroke:#aaaabc;stroke-width:1;}
@@ -578,6 +578,7 @@ function refreshKb(idx){
     const wrapper=document.querySelector(`#kb-block-${i} .keyboard-wrapper`);
     if(wrapper)wrapper.style.paddingLeft=(maxC4Offset-c4Offsets[i])+'px';
   });
+  bindTouchOnSVGs();
 }
 
 // ---- EVENTS ----
@@ -586,33 +587,104 @@ function bindEvents(){
   container.addEventListener('mousedown',evDown);
   container.addEventListener('mousemove',evMove);
   container.addEventListener('mouseup',evUp);
-  container.addEventListener('touchstart',evTouchStart,{passive:false});
-  container.addEventListener('touchmove',evTouchMove,{passive:false});
-  container.addEventListener('touchend',evTouchEnd);
+  // Touch: bind directly on SVGs after render for reliable Safari preventDefault
+  bindTouchOnSVGs();
 }
+
+function bindTouchOnSVGs(){
+  document.querySelectorAll('svg.keyboard').forEach(svg=>{
+    svg.addEventListener('touchstart',evTouchStart,{passive:false});
+    svg.addEventListener('touchmove',evTouchMove,{passive:false});
+    svg.addEventListener('touchend',evTouchEnd,{passive:false});
+  });
+}
+
+// Coordinate-based MIDI lookup — reliable on Safari where elementFromPoint fails during fast drags
+function midiFromCoords(clientX, clientY){
+  // Find which SVG keyboard is at this point
+  const svgs = document.querySelectorAll('svg.keyboard');
+  for(const svg of svgs){
+    const rect = svg.getBoundingClientRect();
+    if(clientX < rect.left || clientX > rect.right || clientY < rect.top || clientY > rect.bottom) continue;
+    // Find the keyboard index from the svg container
+    const container = svg.closest('[id^="kb-svg-"]');
+    if(!container) continue;
+    const kbIdx = parseInt(container.id.replace('kb-svg-',''));
+    if(isNaN(kbIdx)) continue;
+    const kb = S.keyboards[kbIdx];
+    if(!kb) continue;
+    const {keys} = buildLayout(kb.size);
+    // Local x within svg (account for wrapper padding)
+    const localX = clientX - rect.left;
+    const localY = clientY - rect.top;
+    // Check black keys first (they're on top)
+    const blacks = keys.filter(k=>k.black);
+    for(const k of blacks){
+      if(localX >= k.x && localX <= k.x+k.w && localY >= k.y && localY <= k.y+k.h) return k.m;
+    }
+    // Then white keys
+    const whites = keys.filter(k=>!k.black);
+    for(const k of whites){
+      if(localX >= k.x && localX <= k.x+k.w && localY >= k.y && localY <= k.y+k.h) return k.m;
+    }
+    // Below keyboard (zone bars/labels area) — snap to nearest white key at bottom
+    if(localY > WH){
+      let nearest=null, minDist=Infinity;
+      for(const k of whites){
+        const cx=k.x+k.w/2, dist=Math.abs(localX-cx);
+        if(dist<minDist){minDist=dist;nearest=k.m;}
+      }
+      return nearest;
+    }
+    return null;
+  }
+  return null;
+}
+
+// Handle zone-handle detection by coordinates
+function handleFromCoords(clientX, clientY){
+  const svgs = document.querySelectorAll('svg.keyboard');
+  for(const svg of svgs){
+    const rect = svg.getBoundingClientRect();
+    if(clientX < rect.left || clientX > rect.right || clientY < rect.top || clientY > rect.bottom) continue;
+    const container = svg.closest('[id^="kb-svg-"]');
+    if(!container) continue;
+    const kbIdx = parseInt(container.id.replace('kb-svg-',''));
+    if(isNaN(kbIdx)) continue;
+    // Check all handle rects in this SVG
+    const handles = svg.querySelectorAll('.zone-handle');
+    for(const h of handles){
+      const hr = h.getBoundingClientRect();
+      // Enlarge hit area by 8px for easier touch targeting
+      if(clientX >= hr.left-8 && clientX <= hr.right+8 && clientY >= hr.top-8 && clientY <= hr.bottom+8){
+        return {kbIdx:parseInt(h.dataset.kbidx), zoneId:parseInt(h.dataset.zoneid), side:h.dataset.side};
+      }
+    }
+  }
+  return null;
+}
+
+function kbIdxFromTarget(target){
+  const kbEl = target.closest('.keyboard-block');
+  if(!kbEl) return null;
+  const idx = parseInt(kbEl.id.replace('kb-block-',''));
+  return isNaN(idx)?null:idx;
+}
+
 function midiFrom(el){const m=el&&el.dataset&&el.dataset.m;return m!==undefined?parseInt(m):null;}
-function midiFromTouch(e){const t=e.touches[0]||e.changedTouches[0];const el=document.elementFromPoint(t.clientX,t.clientY);return midiFrom(el);}
 
 function handleFrom(el){
   if(!el||!el.classList||!el.classList.contains('zone-handle'))return null;
   return{kbIdx:parseInt(el.dataset.kbidx),zoneId:parseInt(el.dataset.zoneid),side:el.dataset.side};
 }
-function handleFromTouch(e){
-  const t=e.touches[0]||e.changedTouches[0];
-  return handleFrom(document.elementFromPoint(t.clientX,t.clientY));
-}
 
 function evDown(e){
-  // Check for handle first
   const h=handleFrom(e.target);
-  if(h){
-    S.draggingHandle=h;S.mode='handle';
-    e.stopPropagation();return;
-  }
+  if(h){S.draggingHandle=h;S.mode='handle';e.stopPropagation();return;}
   const m=midiFrom(e.target);if(m===null)return;
   if(S.mode==='idle'&&activeSongId!==null){
-    const kbEl=e.target.closest('.keyboard-block');
-    if(kbEl){const idx=parseInt(kbEl.id.replace('kb-block-',''));if(!isNaN(idx))setActiveKb(idx);}
+    const idx=kbIdxFromTarget(e.target);
+    if(idx!==null)setActiveKb(idx);
     startZoneSelection();
   }
   if(S.mode!=='selecting')return;
@@ -637,32 +709,42 @@ function evUp(e){
   S.dragging=false;const m=midiFrom(e.target);
   if(m!==null){S.selEnd=m;updateRangeBadge();refreshKb(S.activeKb);}
 }
+
 function evTouchStart(e){
-  const h=handleFromTouch(e);
+  const t=e.touches[0];
+  const h=handleFromCoords(t.clientX,t.clientY);
   if(h){e.preventDefault();S.draggingHandle=h;S.mode='handle';return;}
-  const m=midiFromTouch(e);if(m===null)return;
+  const m=midiFromCoords(t.clientX,t.clientY);if(m===null)return;
   if(S.mode==='idle'&&activeSongId!==null){
-    const kbEl=e.target.closest('.keyboard-block');
-    if(kbEl){const idx=parseInt(kbEl.id.replace('kb-block-',''));if(!isNaN(idx))setActiveKb(idx);}
+    const idx=kbIdxFromTarget(e.target);
+    if(idx!==null)setActiveKb(idx);
     startZoneSelection();
   }
   if(S.mode!=='selecting')return;
   e.preventDefault();S.dragging=true;S.selStart=m;S.selEnd=m;updateRangeBadge();refreshKb(S.activeKb);
 }
 function evTouchMove(e){
+  if(S.mode!=='selecting'&&S.mode!=='handle')return;
+  e.preventDefault();
+  const t=e.touches[0];
   if(S.mode==='handle'&&S.draggingHandle){
-    e.preventDefault();const m=midiFromTouch(e);if(m!==null)applyHandleDrag(m);return;
+    const m=midiFromCoords(t.clientX,t.clientY);if(m!==null)applyHandleDrag(m);return;
   }
-  if(S.mode!=='selecting'||!S.dragging)return;
-  e.preventDefault();const m=midiFromTouch(e);if(m!==null){S.selEnd=m;updateRangeBadge();refreshKb(S.activeKb);}
+  if(!S.dragging)return;
+  const m=midiFromCoords(t.clientX,t.clientY);
+  if(m!==null){S.selEnd=m;updateRangeBadge();refreshKb(S.activeKb);}
 }
 function evTouchEnd(e){
   if(S.mode==='handle'){
-    const m=midiFromTouch(e);if(m!==null)applyHandleDrag(m);
+    const t=e.changedTouches[0];
+    const m=midiFromCoords(t.clientX,t.clientY);
+    if(m!==null)applyHandleDrag(m);
     commitHandleDrag();return;
   }
   if(S.mode!=='selecting')return;
-  S.dragging=false;const m=midiFromTouch(e);
+  S.dragging=false;
+  const t=e.changedTouches[0];
+  const m=midiFromCoords(t.clientX,t.clientY);
   if(m!==null){S.selEnd=m;updateRangeBadge();refreshKb(S.activeKb);}
 }
 
