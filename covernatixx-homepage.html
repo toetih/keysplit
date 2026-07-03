@@ -501,15 +501,6 @@
   ]
 }
 
-  // ── Video consent ──
-  function loadCoverVideo() {
-    const frame = document.getElementById('videoFrame');
-    const consent = document.getElementById('videoConsent');
-    frame.src = frame.dataset.src;
-    frame.style.display = 'block';
-    consent.style.display = 'none';
-  }
-
   // ── Modals ──
   function openModal(id) {
     document.getElementById(id).classList.add('open');
@@ -670,7 +661,7 @@
 
 
 <!-- ============ VIDEO ============ -->
-<!-- TODO: Professionellen Komplettmitschnitt einbinden sobald verfügbar — dann YouTube-ID in data-src ersetzen -->
+<!-- TODO: Besseres Video-Material einbinden sobald verfügbar — YouTube-ID in src ersetzen -->
 <section class="video-section section-pad" id="video" aria-labelledby="h2-video">
   <div class="halftone"></div>
   <div class="xx-watermark">XX</div>
@@ -681,12 +672,8 @@
     </div>
     <p>Kein Playback, kein Karaoke — so klingt und fühlt sich ein echter Covernatixx-Auftritt an.</p>
     <div class="video-wrap reveal">
-      <div class="video-consent" id="videoConsent">
-        <p>Das Video wird von YouTube (Google) geladen. Beim Klick stimmst du der Datenübertragung an Google zu.</p>
-        <button class="btn btn-magenta" onclick="loadCoverVideo()">▶ Video laden</button>
-      </div>
-      <iframe id="videoFrame" class="video-frame" style="display:none;"
-        src="" data-src="https://www.youtube-nocookie.com/embed/7TtEFdMyRYw?rel=0&amp;modestbranding=1&amp;color=white"
+      <iframe class="video-frame"
+        src="https://www.youtube-nocookie.com/embed/7TtEFdMyRYw?rel=0&amp;modestbranding=1&amp;color=white"
         allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
         allowfullscreen title="Covernatixx – Live-Auftritt"></iframe>
     </div>
@@ -785,7 +772,7 @@
       <div class="eyebrow">Booking</div>
       <h2 id="h2-booking">Lasst uns eure Party planen</h2>
       <p>Ob Stadtfest, Firmenfeier oder private Feier — für Buchungsanfragen wendet euch direkt an unsere Agentur. Die kümmert sich um Verfügbarkeit, Konditionen und alles Organisatorische.</p>
-      <p style="margin-top:20px;font-size:.95rem;color:#3a2a44;"><strong>Direkt zur Band:</strong> Thorsten Hillmann · <a href="tel:+4917075613771" style="color:var(--cyan-dark);font-weight:700;">0170&nbsp;7561371</a><!-- TODO: E-Mail Thorsten Hillmann ergänzen --></p>
+      <p style="margin-top:20px;font-size:.95rem;color:#3a2a44;"><strong>Direkt zur Band:</strong> Thorsten Hillmann · <a href="tel:+4917075613771" style="color:var(--cyan-dark);font-weight:700;">0170&nbsp;7561371</a></p>
       </div>
     <div class="agency-card reveal">
       <h3>Eventagentur Rock &amp; Pop Fabrik</h3>
@@ -877,7 +864,7 @@
     <h3>3. Google Fonts</h3>
     <p>Diese Website lädt Schriftarten von Servern von Google Ireland Limited (Gordon House, Barrow Street, Dublin 4, Irland). Dabei wird Ihre IP-Adresse an Google übertragen. Rechtsgrundlage: Art. 6 Abs. 1 lit. f DSGVO (berechtigtes Interesse an einheitlicher Darstellung). Datenschutzerklärung: <a href="https://policies.google.com/privacy" target="_blank" rel="noopener noreferrer">policies.google.com/privacy</a>.</p>
     <h3>4. YouTube-Videos</h3>
-    <p>Auf dieser Website ist ein YouTube-Video eingebunden, das erst nach Ihrer ausdrücklichen Zustimmung (Klick auf „Video laden") geladen wird. Wir verwenden dabei den datenschutzfreundlichen Modus (youtube-nocookie.com). Erst beim Laden wird eine Verbindung zu YouTube-/Google-Servern hergestellt. Anbieter: Google Ireland Limited. Datenschutzerklärung: <a href="https://policies.google.com/privacy" target="_blank" rel="noopener noreferrer">policies.google.com/privacy</a>.</p>
+    <p>Auf dieser Website ist ein YouTube-Video über den datenschutzfreundlichen Modus von YouTube (youtube-nocookie.com) eingebunden. Beim Aufruf dieser Seite wird eine Verbindung zu Servern von YouTube/Google hergestellt. Anbieter: Google Ireland Limited. Datenschutzerklärung: <a href="https://policies.google.com/privacy" target="_blank" rel="noopener noreferrer">policies.google.com/privacy</a>.</p>
     <h3>5. Ihre Rechte</h3>
     <p>Sie haben das Recht auf Auskunft (Art. 15 DSGVO), Berichtigung (Art. 16), Löschung (Art. 17), Einschränkung der Verarbeitung (Art. 18) und Datenübertragbarkeit (Art. 20). Beschwerden können Sie an die zuständige Datenschutzaufsichtsbehörde richten.</p>
   </div>
