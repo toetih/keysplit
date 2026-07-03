@@ -3,8 +3,8 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Covernatixx – Coverband buchen | Rock, Pop &amp; Charts live | NRW &amp; Deutschlandweit</title>
-<meta name="description" content="Covernatixx — professionelle Coverband für Rock, Pop & Charts live auf der Bühne. Termine & Booking über die Eventagentur Rock & Pop Fabrik.">
+<title>Covernatixx – Professionelle Coverband aus dem Sauerland | Booking</title>
+<meta name="description" content="Covernatixx ist eine sechsköpfige Profi-Coverband aus Iserlohn/NRW. Rock &amp; Pop, Top 40, live auf Stadtfesten, Firmenfeiern und Events im Sauerland und deutschlandweit. Jetzt Booking anfragen.">
 <!-- ══ SEO / Canonical ══ -->
 <link rel="canonical" href="https://www.covernatixx.de/">
 <meta name="robots" content="index, follow">
@@ -13,15 +13,15 @@
 
 <!-- ══ Geo / Local SEO ══ -->
 <meta name="geo.region" content="DE-NW">
-<meta name="geo.placename" content="Nordrhein-Westfalen">
+<meta name="geo.placename" content="Iserlohn, Märkischer Kreis, NRW">
 
 <!-- ══ Open Graph (Facebook, WhatsApp, LinkedIn …) ══ -->
 <meta property="og:type" content="website">
 <meta property="og:locale" content="de_DE">
 <meta property="og:site_name" content="Covernatixx">
 <meta property="og:url" content="https://www.covernatixx.de/">
-<meta property="og:title" content="Covernatixx – Coverband für Rock, Pop &amp; Charts buchen">
-<meta property="og:description" content="Professionelle Coverband aus NRW – 6 Musiker, eigenes Equipment, live für Stadtfeste, Firmenfeiern &amp; Privatevents. Jetzt Booking anfragen!">
+<meta property="og:title" content="Covernatixx – Professionelle Coverband aus dem Sauerland | Booking">
+<meta property="og:description" content="Sechsköpfige Profi-Coverband aus Iserlohn/NRW – Rock &amp; Pop live auf Stadtfesten, Firmenfeiern und Events im Sauerland. Jetzt Booking anfragen!">
 <meta property="og:image" content="https://www.covernatixx.de/images/band.jpg">
 <meta property="og:image:width" content="1456">
 <meta property="og:image:height" content="816">
@@ -29,8 +29,8 @@
 
 <!-- ══ Twitter / X Card ══ -->
 <meta name="twitter:card" content="summary_large_image">
-<meta name="twitter:title" content="Covernatixx – Coverband für Rock, Pop &amp; Charts buchen">
-<meta name="twitter:description" content="Professionelle Coverband aus NRW – live für Stadtfeste, Firmenfeiern &amp; Privatevents. Booking über Eventagentur Rock &amp; Pop Fabrik.">
+<meta name="twitter:title" content="Covernatixx – Professionelle Coverband aus dem Sauerland | Booking">
+<meta name="twitter:description" content="Profi-Coverband aus Iserlohn/NRW – Rock &amp; Pop live auf Stadtfesten und Firmenfeiern im Sauerland. Booking über Eventagentur Rock &amp; Pop Fabrik.">
 <meta name="twitter:image" content="https://www.covernatixx.de/images/band.jpg">
 <meta name="twitter:image:alt" content="Covernatixx live auf der Bühne">
 
@@ -320,6 +320,106 @@
     transition:top .2s ease; text-decoration:none;
   }
   .skip-nav:focus{top:0;}
+
+  /* ── Set-Format ── */
+  .set-format{color:rgba(251,243,230,.78);font-size:.98rem;margin-top:0 !important;position:relative;z-index:2;}
+  .set-format strong{color:var(--cyan);}
+
+  /* ── Band Members ── */
+  .members-section{background:var(--ink-soft-2);}
+  .members-section h2{font-size:clamp(2.1rem,4.4vw,3.1rem);color:var(--cream-bright);}
+  .members-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:22px;margin-top:48px;}
+  @media(max-width:860px){.members-grid{grid-template-columns:repeat(2,1fr);}}
+  @media(max-width:540px){.members-grid{grid-template-columns:1fr;}}
+  .member-card{
+    background:var(--ink-soft);border:2px solid rgba(251,243,230,.12);
+    border-radius:18px;padding:26px 22px;
+    transition:border-color .2s ease,transform .2s ease;
+  }
+  .member-card:hover{border-color:var(--magenta);transform:translateY(-3px);}
+  .member-instr{
+    display:inline-block;font-size:.72rem;font-weight:700;letter-spacing:.1em;
+    text-transform:uppercase;padding:4px 12px;border-radius:100px;
+    background:var(--magenta);color:var(--cream-bright);margin-bottom:14px;
+  }
+  .member-card h3{
+    font-family:"Poppins",sans-serif;font-weight:700;font-size:1.05rem;
+    color:var(--cream-bright);margin-bottom:6px;
+    text-transform:none;letter-spacing:0;line-height:1.3;
+  }
+  .member-bio{font-size:.88rem;color:rgba(251,243,230,.68);margin:0 !important;}
+  .member-cred{
+    font-size:.78rem;font-weight:700;color:var(--cyan);
+    margin-top:10px !important;display:flex;align-items:center;gap:6px;
+  }
+  .member-cred::before{content:"★";color:var(--magenta);}
+
+  /* ── Video ── */
+  .video-section{background:var(--ink);text-align:center;}
+  .video-section .eyebrow{justify-content:center;}
+  .video-section h2{font-size:clamp(2.1rem,4.4vw,3.1rem);color:var(--cream-bright);max-width:640px;margin:0 auto;}
+  .video-section>.wrap>p{max-width:600px;margin:18px auto 40px;color:rgba(251,243,230,.78);position:relative;z-index:2;}
+  .video-wrap{
+    position:relative;z-index:2;border-radius:var(--radius);overflow:hidden;
+    border:3px solid rgba(251,243,230,.12);box-shadow:var(--shadow-soft);
+    max-width:900px;margin:0 auto;
+  }
+  .video-consent{
+    background:var(--ink-soft);padding:56px 40px;
+    display:flex;flex-direction:column;align-items:center;gap:20px;
+  }
+  .video-consent p{color:rgba(251,243,230,.68);font-size:.9rem;max-width:400px;margin:0;}
+  .video-frame{width:100%;aspect-ratio:16/9;border:0;display:block;}
+
+  /* ── Referenzen ── */
+  .refs-section{background:var(--cream);color:var(--text-dark);}
+  .refs-section h2{font-size:clamp(2.1rem,4.4vw,3.1rem);color:var(--magenta-dark);}
+  .refs-section>.wrap>p{margin-top:16px;font-size:1.05rem;color:#3a2a44;}
+  .refs-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:20px;margin-top:40px;}
+  @media(max-width:660px){.refs-grid{grid-template-columns:1fr;}}
+  .ref-card{
+    display:flex;align-items:flex-start;gap:18px;
+    background:var(--cream-bright);border:3px solid var(--ink);
+    border-radius:18px;box-shadow:var(--shadow-hard);padding:24px 22px;
+  }
+  .ref-icon{font-size:1.8rem;line-height:1;flex-shrink:0;margin-top:2px;}
+  .ref-info strong{font-family:"Anton",sans-serif;font-size:1.05rem;letter-spacing:.01em;display:block;margin-bottom:4px;}
+  .ref-info span{font-size:.9rem;color:#5a4a66;}
+
+  /* ── Modals ── */
+  .modal-overlay{
+    display:none;position:fixed;inset:0;z-index:500;
+    background:rgba(11,8,16,.88);backdrop-filter:blur(4px);
+    overflow-y:auto;padding:40px 20px;
+  }
+  .modal-overlay.open{display:flex;align-items:flex-start;justify-content:center;}
+  .modal-box{
+    background:var(--cream-bright);color:var(--text-dark);
+    border:3px solid var(--ink);border-radius:var(--radius);
+    box-shadow:var(--shadow-soft);max-width:700px;width:100%;
+    padding:48px 40px;position:relative;margin:auto;
+  }
+  @media(max-width:600px){.modal-box{padding:32px 20px;}}
+  .modal-close{
+    position:absolute;top:18px;right:18px;background:none;
+    border:2px solid var(--ink);border-radius:50%;
+    width:36px;height:36px;cursor:pointer;font-size:1rem;line-height:1;
+    display:flex;align-items:center;justify-content:center;color:var(--ink);
+    transition:background .18s,color .18s,border-color .18s;
+  }
+  .modal-close:hover{background:var(--magenta);color:var(--cream-bright);border-color:var(--magenta);}
+  .modal-box h2{font-size:clamp(1.6rem,3vw,2rem);color:var(--magenta-dark);margin-bottom:24px;}
+  .modal-box h3{
+    font-family:"Poppins",sans-serif;font-weight:700;font-size:1rem;
+    color:var(--magenta-dark);margin:22px 0 8px;
+    text-transform:none;letter-spacing:0;line-height:1.4;
+  }
+  .modal-box p,.modal-box address{font-size:.93rem;line-height:1.75;color:#3a2a44;font-style:normal;}
+  .modal-box a{color:var(--cyan-dark);text-decoration:underline;}
+  .modal-todo{
+    background:#fff3cd;border:1px solid #ffc107;border-radius:8px;
+    padding:10px 14px;font-size:.82rem;color:#856404;margin:8px 0 16px;
+  }
 </style>
 
 <!-- ══ Structured Data: MusicGroup + LocalBusiness ══ -->
@@ -332,7 +432,7 @@
       "@id": "https://www.covernatixx.de/#band",
       "name": "Covernatixx",
       "url": "https://www.covernatixx.de/",
-      "description": "Professionelle Coverband für Rock, Pop und Charts. 6 Musiker mit jahrelanger Bühnenerfahrung und eigenem Ton- und Lichtequipment. Live für Stadtfeste, Firmenfeiern und Privatevents in NRW und deutschlandweit.",
+      "description": "Professionelle Coverband aus Iserlohn im Märkischen Kreis/Sauerland. 6 erfahrene Musiker live für Stadtfeste, Firmenfeiern und Privatevents in NRW und deutschlandweit.",
       "genre": ["Rock", "Pop", "Charts", "Classic Rock", "80er", "90er"],
       "numberOfMembers": 6,
       "areaServed": {
@@ -400,6 +500,32 @@
     }
   ]
 }
+
+  // ── Video consent ──
+  function loadCoverVideo() {
+    const frame = document.getElementById('videoFrame');
+    const consent = document.getElementById('videoConsent');
+    frame.src = frame.dataset.src;
+    frame.style.display = 'block';
+    consent.style.display = 'none';
+  }
+
+  // ── Modals ──
+  function openModal(id) {
+    document.getElementById(id).classList.add('open');
+    document.body.style.overflow = 'hidden';
+  }
+  function closeModal(id) {
+    document.getElementById(id).classList.remove('open');
+    document.body.style.overflow = '';
+  }
+  document.querySelectorAll('.modal-overlay').forEach(el => {
+    el.addEventListener('click', e => { if (e.target === el) closeModal(el.id); });
+  });
+  document.addEventListener('keydown', e => {
+    if (e.key === 'Escape') document.querySelectorAll('.modal-overlay.open').forEach(el => closeModal(el.id));
+  });
+
 </script>
 </head>
 <body>
@@ -414,6 +540,7 @@
       <a href="#ueber-uns">Über uns</a>
       <a href="#sound">Sound</a>
       <a href="#termine">Termine</a>
+      <a href="#referenzen">Referenzen</a>
       <a href="#booking">Booking</a>
     </nav>
     <div class="nav-cta">
@@ -430,7 +557,7 @@
   <div class="wrap hero-grid">
     <div class="eyebrow">Professionelle Coverband</div>
     <h1>COVERNATI<span class="xx">XX</span></h1>
-    <p class="hero-sub">Rock, Pop &amp; Charts — live gespielt, mit voller Bühnenpower. Covernatixx bringt Stadtfeste, Firmenfeiern und private Events deutschlandweit zum Kochen.</p>
+    <p class="hero-sub">Rock, Pop &amp; Charts — live gespielt, mit voller Bühnenpower. Covernatixx aus dem Sauerland bringt Stadtfeste, Firmenfeiern und private Events im Märkischen Kreis und weit darüber hinaus zum Kochen.</p>
     <div class="hero-ctas">
       <a href="#termine" class="btn btn-magenta">Termine ansehen</a>
       <a href="#booking" class="btn btn-outline">Jetzt buchen</a>
@@ -464,12 +591,57 @@
     <div class="reveal about-text">
       <div class="eyebrow">Die Band</div>
       <h2 id="h2-ueber-uns">6 Musiker. Eine Mission: Party.</h2>
-      <p>Covernatixx ist eine professionelle Coverband. Wir lesen das Publikum, nicht nur die Setlist — und wechseln zwischen Rock-Klassikern, aktuellen Charts und echten Party-Hits genau dann, wenn es die Stimmung verlangt. Mit jahrelanger Bühnenerfahrung und eigenem Ton- und Lichtequipment sorgen wir dafür, dass eure Feier in Erinnerung bleibt.</p>
+      <p>Covernatixx ist eine professionelle Coverband aus Iserlohn im Märkischen Kreis. Wir lesen das Publikum, nicht nur die Setlist — und wechseln zwischen Rock-Klassikern, aktuellen Charts und echten Party-Hits genau dann, wenn es die Stimmung verlangt. Mit jahrelanger Bühnenerfahrung sorgen wir dafür, dass eure Feier in Erinnerung bleibt.</p>
       <div class="about-tags">
         <span class="chip">🎪 Stadtfeste</span>
         <span class="chip">🏢 Firmenfeiern</span>
         <span class="chip">🍻 Vereinsfeiern</span>
         <span class="chip">🔒 Private Events</span>
+      </div>
+    </div>
+  </div>
+</section>
+
+
+<!-- ============ BAND MEMBERS ============ -->
+<section class="members-section section-pad" id="band" aria-labelledby="h2-band">
+  <div class="wrap">
+    <div class="reveal">
+      <div class="eyebrow">Die Musiker</div>
+      <h2 id="h2-band">Sechs Profis. Eine Bühne.</h2>
+    </div>
+    <div class="members-grid">
+      <div class="member-card reveal">
+        <span class="member-instr">Gesang</span>
+        <h3>Sebastian Düring</h3>
+        <p class="member-bio">Komponist, Musiklehrer und Sänger.</p>
+        <p class="member-cred">Vorband von Udo Jürgens</p>
+      </div>
+      <div class="member-card reveal">
+        <span class="member-instr">Gesang</span>
+        <h3>Anna Chernomordik</h3>
+        <!-- TODO: Kurze Bio von Anna Chernomordik ergänzen -->
+      </div>
+      <div class="member-card reveal">
+        <span class="member-instr">Keyboard</span>
+        <h3>Thorsten Hillmann</h3>
+        <p class="member-cred">Vorband von Udo Jürgens &amp; Jeff Scott Soto</p>
+      </div>
+      <div class="member-card reveal">
+        <span class="member-instr">Gitarre</span>
+        <h3>Niels Schimpf</h3>
+        <p class="member-bio">Profimusiker und Musiklehrer.</p>
+      </div>
+      <div class="member-card reveal">
+        <span class="member-instr">Bass</span>
+        <h3>Leo Weichert</h3>
+        <p class="member-bio">Profimusiker und Musiklehrer.</p>
+      </div>
+      <div class="member-card reveal">
+        <span class="member-instr">Schlagzeug</span>
+        <h3>Jan Zimmer</h3>
+        <p class="member-bio">Ex-Schlagzeuger von Luxuslärm.</p>
+        <p class="member-cred">Vorband von Revolverheld &amp; Pur</p>
       </div>
     </div>
   </div>
@@ -484,6 +656,7 @@
       <div class="eyebrow">Unser Sound</div>
       <h2 id="h2-sound">Von Rock-Klassikern bis zum aktuellen Charts-Hit</h2>
       <p>Live gespielt, nicht vom Band. So klingt das Repertoire, mit dem wir jede Tanzfläche füllen.</p>
+      <p class="set-format reveal">Spielformat: <strong>3 Sets à 45–60 Minuten</strong>, flexibel anpassbar an euren Ablauf.</p>
     </div>
     <div class="genre-cloud reveal">
       <span class="genre-pill">Classic Rock</span>
@@ -491,6 +664,31 @@
       <span class="genre-pill">80er &amp; 90er</span>
       <span class="genre-pill">Charts von heute</span>
       <span class="genre-pill">Party-Klassiker</span>
+    </div>
+  </div>
+</section>
+
+
+<!-- ============ VIDEO ============ -->
+<!-- TODO: Professionellen Komplettmitschnitt einbinden sobald verfügbar — dann YouTube-ID in data-src ersetzen -->
+<section class="video-section section-pad" id="video" aria-labelledby="h2-video">
+  <div class="halftone"></div>
+  <div class="xx-watermark">XX</div>
+  <div class="wrap" style="position:relative;">
+    <div class="reveal">
+      <div class="eyebrow">Live-Eindruck</div>
+      <h2 id="h2-video">Seht selbst, was Covernatixx kann</h2>
+    </div>
+    <p>Kein Playback, kein Karaoke — so klingt und fühlt sich ein echter Covernatixx-Auftritt an.</p>
+    <div class="video-wrap reveal">
+      <div class="video-consent" id="videoConsent">
+        <p>Das Video wird von YouTube (Google) geladen. Beim Klick stimmst du der Datenübertragung an Google zu.</p>
+        <button class="btn btn-magenta" onclick="loadCoverVideo()">▶ Video laden</button>
+      </div>
+      <iframe id="videoFrame" class="video-frame" style="display:none;"
+        src="" data-src="https://www.youtube-nocookie.com/embed/7TtEFdMyRYw?rel=0&amp;modestbranding=1&amp;color=white"
+        allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+        allowfullscreen title="Covernatixx – Live-Auftritt"></iframe>
     </div>
   </div>
 </section>
@@ -538,6 +736,48 @@
   </div>
 </section>
 
+
+<!-- ============ REFERENZEN ============ -->
+<section class="refs-section section-pad" id="referenzen" aria-labelledby="h2-refs">
+  <div class="wrap">
+    <div class="reveal">
+      <div class="eyebrow">Referenzen</div>
+      <h2 id="h2-refs">Das haben wir schon gerockt</h2>
+      <p>Von Firmenfeiern über Stadtfeste bis zu großen Privatveranstaltungen — ein Auszug aus unseren Auftritten.</p>
+    </div>
+    <div class="refs-grid">
+      <div class="ref-card reveal">
+        <div class="ref-icon">🏭</div>
+        <div class="ref-info">
+          <strong>CD Wälzholz</strong>
+          <span>Firmen-Open-Air · ca. 500 Gäste</span>
+        </div>
+      </div>
+      <div class="ref-card reveal">
+        <div class="ref-icon">🎪</div>
+        <div class="ref-info">
+          <strong>Brückenfest Letmathe – Genuss Pur</strong>
+          <span>Hauptbühne</span>
+        </div>
+      </div>
+      <div class="ref-card reveal">
+        <div class="ref-icon">🎉</div>
+        <div class="ref-info">
+          <strong>Stadtfeste &amp; Events</strong>
+          <span>Diverse Veranstaltungen in Letmathe und Iserlohn</span>
+        </div>
+      </div>
+      <div class="ref-card reveal">
+        <div class="ref-icon">🥂</div>
+        <div class="ref-info">
+          <strong>Private Großveranstaltungen</strong>
+          <span>Geburtstagsfeiern &amp; private Events · Konditionen auf Anfrage</span>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
 <!-- ============ BOOKING ============ -->
 <section class="booking-section section-pad" id="booking" aria-labelledby="h2-booking">
   <div class="wrap booking-grid">
@@ -545,6 +785,7 @@
       <div class="eyebrow">Booking</div>
       <h2 id="h2-booking">Lasst uns eure Party planen</h2>
       <p>Ob Stadtfest, Firmenfeier oder private Feier — für Buchungsanfragen wendet euch direkt an unsere Agentur. Die kümmert sich um Verfügbarkeit, Konditionen und alles Organisatorische.</p>
+      <p style="margin-top:20px;font-size:.95rem;color:#3a2a44;"><strong>Direkt zur Band:</strong> Thorsten Hillmann · <a href="tel:+4917075613771" style="color:var(--cyan-dark);font-weight:700;">0170&nbsp;7561371</a><!-- TODO: E-Mail Thorsten Hillmann ergänzen --></p>
       </div>
     <div class="agency-card reveal">
       <h3>Eventagentur Rock &amp; Pop Fabrik</h3>
@@ -554,7 +795,7 @@
         58642 Iserlohn-Letmathe
       </address>
       <a href="mailto:info@rockpopfabrik.de?subject=Booking-Anfrage%20Covernatixx" class="btn btn-magenta" rel="noopener">✉ info@rockpopfabrik.de</a>
-      <p class="direct-note">Die Agentur bündelt alle Anfragen für Covernatixx — so bekommt ihr die schnellste Antwort zu Verfügbarkeit und Gage.</p>
+      <p class="direct-note">Die Agentur bündelt alle Anfragen für Covernatixx — so bekommt ihr die schnellste Antwort zu Verfügbarkeit und Konditionen.</p>
     </div>
   </div>
 </section>
@@ -573,16 +814,18 @@
         <h4>Navigation</h4>
         <ul>
           <li><a href="#ueber-uns">Über uns</a></li>
+          <li><a href="#band">Die Band</a></li>
           <li><a href="#video">Video</a></li>
           <li><a href="#sound">Sound</a></li>
           <li><a href="#termine">Termine</a></li>
+          <li><a href="#referenzen">Referenzen</a></li>
         </ul>
       </div>
       <div class="foot-col">
         <h4>Rechtliches</h4>
         <ul>
-          <li><a href="#">Impressum</a></li>
-          <li><a href="#">Datenschutz</a></li>
+          <li><a href="#" onclick="openModal('modal-impressum');return false;">Impressum</a></li>
+          <li><a href="#" onclick="openModal('modal-datenschutz');return false;">Datenschutz</a></li>
         </ul>
       </div>
     </div>
@@ -592,6 +835,53 @@
     </div>
   </div>
 </footer>
+
+
+<!-- ══ MODAL: IMPRESSUM ══ -->
+<div class="modal-overlay" id="modal-impressum" role="dialog" aria-modal="true" aria-labelledby="impressum-title">
+  <div class="modal-box">
+    <button class="modal-close" onclick="closeModal('modal-impressum')" aria-label="Schließen">✕</button>
+    <h2 id="impressum-title">Impressum</h2>
+    <p><em>Angaben gemäß § 5 TMG</em></p>
+    <div class="modal-todo">⚠ TODO: Klären wer rechtlich Diensteanbieter der Website ist (wer betreibt/besitzt die Domain covernatixx.de?). Ggf. Rechtsform, Handelsregisternummer und USt-ID ergänzen.</div>
+    <h3>Verantwortlich für den Inhalt</h3>
+    <address>
+      Eventagentur Rock &amp; Pop Fabrik<br>
+      Overwegstraße 14a<br>
+      58642 Iserlohn-Letmathe<br>
+      E-Mail: <a href="mailto:info@rockpopfabrik.de">info@rockpopfabrik.de</a>
+    </address>
+    <h3>Haftung für Inhalte</h3>
+    <p>Die Inhalte dieser Seite wurden mit größter Sorgfalt erstellt. Als Diensteanbieter sind wir gemäß § 7 Abs. 1 TMG für eigene Inhalte nach den allgemeinen Gesetzen verantwortlich. Für Richtigkeit, Vollständigkeit und Aktualität können wir jedoch keine Gewähr übernehmen.</p>
+    <h3>Haftung für Links</h3>
+    <p>Diese Website enthält Links zu externen Webseiten Dritter. Für deren Inhalte ist stets der jeweilige Anbieter oder Betreiber verantwortlich. Eine permanente inhaltliche Kontrolle der verlinkten Seiten ist ohne konkrete Anhaltspunkte einer Rechtsverletzung nicht zumutbar.</p>
+    <h3>Urheberrecht</h3>
+    <p>Die durch den Seitenbetreiber erstellten Inhalte und Werke auf dieser Website unterliegen dem deutschen Urheberrecht. Vervielfältigung, Bearbeitung oder Verbreitung außerhalb der Grenzen des Urheberrechts bedürfen der schriftlichen Zustimmung.</p>
+  </div>
+</div>
+
+<!-- ══ MODAL: DATENSCHUTZ ══ -->
+<div class="modal-overlay" id="modal-datenschutz" role="dialog" aria-modal="true" aria-labelledby="datenschutz-title">
+  <div class="modal-box">
+    <button class="modal-close" onclick="closeModal('modal-datenschutz')" aria-label="Schließen">✕</button>
+    <h2 id="datenschutz-title">Datenschutzerklärung</h2>
+    <h3>1. Verantwortlicher (Art. 4 Nr. 7 DSGVO)</h3>
+    <address>
+      Eventagentur Rock &amp; Pop Fabrik<br>
+      Overwegstraße 14a<br>
+      58642 Iserlohn-Letmathe<br>
+      E-Mail: <a href="mailto:info@rockpopfabrik.de">info@rockpopfabrik.de</a>
+    </address>
+    <h3>2. Datenerhebung auf dieser Website</h3>
+    <p>Diese Website enthält kein Kontaktformular. Wenn Sie uns per E-Mail kontaktieren, werden Ihre Daten ausschließlich zur Bearbeitung Ihrer Anfrage verwendet. Der Hosting-Anbieter speichert automatisch Server-Logfiles (IP-Adresse, Browsertyp, Betriebssystem, Uhrzeit) — diese Daten sind zur Auslieferung der Website technisch erforderlich.</p>
+    <h3>3. Google Fonts</h3>
+    <p>Diese Website lädt Schriftarten von Servern von Google Ireland Limited (Gordon House, Barrow Street, Dublin 4, Irland). Dabei wird Ihre IP-Adresse an Google übertragen. Rechtsgrundlage: Art. 6 Abs. 1 lit. f DSGVO (berechtigtes Interesse an einheitlicher Darstellung). Datenschutzerklärung: <a href="https://policies.google.com/privacy" target="_blank" rel="noopener noreferrer">policies.google.com/privacy</a>.</p>
+    <h3>4. YouTube-Videos</h3>
+    <p>Auf dieser Website ist ein YouTube-Video eingebunden, das erst nach Ihrer ausdrücklichen Zustimmung (Klick auf „Video laden") geladen wird. Wir verwenden dabei den datenschutzfreundlichen Modus (youtube-nocookie.com). Erst beim Laden wird eine Verbindung zu YouTube-/Google-Servern hergestellt. Anbieter: Google Ireland Limited. Datenschutzerklärung: <a href="https://policies.google.com/privacy" target="_blank" rel="noopener noreferrer">policies.google.com/privacy</a>.</p>
+    <h3>5. Ihre Rechte</h3>
+    <p>Sie haben das Recht auf Auskunft (Art. 15 DSGVO), Berichtigung (Art. 16), Löschung (Art. 17), Einschränkung der Verarbeitung (Art. 18) und Datenübertragbarkeit (Art. 20). Beschwerden können Sie an die zuständige Datenschutzaufsichtsbehörde richten.</p>
+  </div>
+</div>
 
 <script>
   // ====================================================================
