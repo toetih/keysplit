@@ -372,6 +372,13 @@
   }
   .video-consent p{color:rgba(251,243,230,.68);font-size:.9rem;max-width:400px;margin:0;}
   .video-frame{width:100%;aspect-ratio:16/9;border:0;display:block;}
+  .video-grid{
+    display:flex;gap:32px;justify-content:center;align-items:flex-start;
+    flex-wrap:wrap;position:relative;z-index:2;
+  }
+  .video-grid .video-wrap{margin:0;max-width:640px;flex:1 1 420px;}
+  .video-grid .video-wrap.video-wrap-vertical{max-width:280px;flex:0 1 280px;}
+  .video-frame-vertical{aspect-ratio:9/16;}
 
   /* ── Referenzen ── */
   .refs-section{background:var(--cream);color:var(--text-dark);}
@@ -576,11 +583,19 @@
       <h2 id="h2-video">Seht selbst, was Covernatixx kann</h2>
     </div>
     <p>Kein Playback, kein Karaoke — so klingt und fühlt sich ein echter Covernatixx-Auftritt an.</p>
-    <div class="video-wrap reveal">
-      <iframe class="video-frame"
-        src="https://www.youtube-nocookie.com/embed/7TtEFdMyRYw?rel=0&amp;modestbranding=1&amp;color=white"
-        allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-        allowfullscreen title="Covernatixx – Live-Auftritt"></iframe>
+    <div class="video-grid reveal">
+      <div class="video-wrap">
+        <iframe class="video-frame"
+          src="https://www.youtube-nocookie.com/embed/7TtEFdMyRYw?rel=0&amp;modestbranding=1&amp;color=white"
+          allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+          allowfullscreen title="Covernatixx – Live-Auftritt"></iframe>
+      </div>
+      <div class="video-wrap video-wrap-vertical">
+        <iframe class="video-frame video-frame-vertical"
+          src="https://www.youtube-nocookie.com/embed/PpeR_JyoS_U?rel=0&amp;modestbranding=1&amp;color=white"
+          allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+          allowfullscreen title="Covernatixx live – ETUF Essen – Verdammt ich lieb dich"></iframe>
+      </div>
     </div>
   </div>
 </section>
@@ -620,15 +635,6 @@
       <a href="#booking" class="btn btn-magenta btn-sm">Für eure Feier buchen</a>
     </div>
     <div class="ticket-list">
-      <div class="ticket reveal">
-        <div class="ticket-date"><span class="day">18</span><span class="month">Jul 2026</span></div>
-        <div class="ticket-info">
-          <div class="venue">ETUF Hockeycup</div>
-          <div class="place">Essen</div>
-          <span class="ticket-tag tag-private">Privat</span>
-        </div>
-        <a href="#booking" class="btn btn-outline btn-sm" style="color:var(--text-dark); border-color:var(--text-dark);">Info</a>
-      </div>
       <div class="ticket reveal">
         <div class="ticket-date"><span class="day">19</span><span class="month">Sep 2026</span></div>
         <div class="ticket-info">
