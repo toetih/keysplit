@@ -41,10 +41,6 @@
 <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png">
 <link rel="manifest" href="/site.webmanifest">
 
-<!-- ══ Performance: Font Preconnect ══ -->
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Anton&family=Poppins:ital,wght@0,300;0,400;0,500;0,600;0,700;0,800;1,600&display=swap" rel="stylesheet">
 <style>
   :root{
     --ink:#0B0810;
@@ -379,6 +375,8 @@
   .video-grid .video-wrap{margin:0;max-width:640px;flex:1 1 420px;}
   .video-grid .video-wrap.video-wrap-vertical{max-width:280px;flex:0 1 280px;}
   .video-frame-vertical{aspect-ratio:9/16;}
+  .video-frame.video-consent{display:flex;cursor:pointer;justify-content:center;text-align:center;}
+  .video-frame.video-consent .btn{pointer-events:none;}
 
   /* ── Referenzen ── */
   .refs-section{background:var(--cream);color:var(--text-dark);}
@@ -429,6 +427,19 @@
     background:#fff3cd;border:1px solid #ffc107;border-radius:8px;
     padding:10px 14px;font-size:.82rem;color:#856404;margin:8px 0 16px;
   }
+
+  /* ── Cookie Banner ── */
+  #cookie-banner{
+    display:none;position:fixed;left:0;right:0;bottom:0;z-index:600;
+    background:var(--ink);color:rgba(251,243,230,.9);
+    border-top:3px solid var(--magenta);
+    padding:20px 24px;align-items:center;gap:24px;flex-wrap:wrap;
+    justify-content:space-between;
+  }
+  #cookie-banner p{margin:0;font-size:.88rem;line-height:1.6;max-width:640px;flex:1 1 320px;}
+  #cookie-banner p a{color:var(--cyan);text-decoration:underline;}
+  #cookie-banner .cookie-actions{display:flex;gap:12px;flex-wrap:wrap;}
+  #cookie-banner .btn{padding:10px 22px;font-size:.85rem;}
 </style>
 
 <!-- ══ Structured Data: MusicGroup + LocalBusiness ══ -->
@@ -585,16 +596,20 @@
     <p>Kein Playback, kein Karaoke — so klingt und fühlt sich ein echter Covernatixx-Auftritt an.</p>
     <div class="video-grid reveal">
       <div class="video-wrap">
-        <iframe class="video-frame"
-          src="https://www.youtube-nocookie.com/embed/7TtEFdMyRYw?rel=0&amp;modestbranding=1&amp;color=white"
-          allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-          allowfullscreen title="Covernatixx – Live-Auftritt"></iframe>
+        <div class="video-consent video-frame yt-placeholder" tabindex="0" role="button"
+          data-yt-src="https://www.youtube-nocookie.com/embed/7TtEFdMyRYw?rel=0&amp;modestbranding=1&amp;color=white"
+          data-yt-title="Covernatixx – Live-Auftritt">
+          <p>Zum Abspielen wird eine Verbindung zu YouTube hergestellt. Details in unserer Datenschutzerklärung.</p>
+          <span class="btn btn-magenta btn-sm">▶ Video laden</span>
+        </div>
       </div>
       <div class="video-wrap video-wrap-vertical">
-        <iframe class="video-frame video-frame-vertical"
-          src="https://www.youtube-nocookie.com/embed/PpeR_JyoS_U?rel=0&amp;modestbranding=1&amp;color=white"
-          allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-          allowfullscreen title="Covernatixx live – ETUF Essen – Verdammt ich lieb dich"></iframe>
+        <div class="video-consent video-frame video-frame-vertical yt-placeholder" tabindex="0" role="button"
+          data-yt-src="https://www.youtube-nocookie.com/embed/PpeR_JyoS_U?rel=0&amp;modestbranding=1&amp;color=white"
+          data-yt-title="Covernatixx live – ETUF Essen – Verdammt ich lieb dich">
+          <p>Zum Abspielen wird eine Verbindung zu YouTube hergestellt. Details in unserer Datenschutzerklärung.</p>
+          <span class="btn btn-magenta btn-sm">▶ Video laden</span>
+        </div>
       </div>
     </div>
   </div>
@@ -750,9 +765,18 @@
     <h3>3. Google Fonts</h3>
     <p>Diese Website lädt Schriftarten von Servern von Google Ireland Limited (Gordon House, Barrow Street, Dublin 4, Irland). Dabei wird Ihre IP-Adresse an Google übertragen. Rechtsgrundlage: Art. 6 Abs. 1 lit. f DSGVO (berechtigtes Interesse an einheitlicher Darstellung). Datenschutzerklärung: <a href="https://policies.google.com/privacy" target="_blank" rel="noopener noreferrer">policies.google.com/privacy</a>.</p>
     <h3>4. YouTube-Videos</h3>
-    <p>Auf dieser Website ist ein YouTube-Video über den datenschutzfreundlichen Modus von YouTube (youtube-nocookie.com) eingebunden. Beim Aufruf dieser Seite wird eine Verbindung zu Servern von YouTube/Google hergestellt. Anbieter: Google Ireland Limited. Datenschutzerklärung: <a href="https://policies.google.com/privacy" target="_blank" rel="noopener noreferrer">policies.google.com/privacy</a>.</p>
+    <p>Auf dieser Website sind YouTube-Videos über den datenschutzfreundlichen Modus von YouTube (youtube-nocookie.com) eingebunden. Diese werden erst nach Klick und Ihrer Einwilligung geladen — erst dann wird eine Verbindung zu Servern von YouTube/Google hergestellt. Anbieter: Google Ireland Limited. Datenschutzerklärung: <a href="https://policies.google.com/privacy" target="_blank" rel="noopener noreferrer">policies.google.com/privacy</a>.</p>
     <h3>5. Ihre Rechte</h3>
     <p>Sie haben das Recht auf Auskunft (Art. 15 DSGVO), Berichtigung (Art. 16), Löschung (Art. 17), Einschränkung der Verarbeitung (Art. 18) und Datenübertragbarkeit (Art. 20). Beschwerden können Sie an die zuständige Datenschutzaufsichtsbehörde richten.</p>
+  </div>
+</div>
+
+<!-- ══ COOKIE BANNER ══ -->
+<div id="cookie-banner" role="dialog" aria-modal="false" aria-labelledby="cookie-banner-text">
+  <p id="cookie-banner-text">Wir nutzen Google Fonts und YouTube-Videos, wodurch eine Verbindung zu Google-Servern hergestellt wird. Details dazu findest du in unserer <a href="#" onclick="openModal('modal-datenschutz');return false;">Datenschutzerklärung</a>.</p>
+  <div class="cookie-actions">
+    <button type="button" class="btn btn-outline" onclick="cookieDecline()">Ablehnen</button>
+    <button type="button" class="btn btn-magenta" onclick="cookieAccept()">Akzeptieren</button>
   </div>
 </div>
 
@@ -799,7 +823,6 @@
   // ── Cookie Consent ──────────────────────────────────────────────────
   (function(){
     var FONTS_URL='https://fonts.googleapis.com/css2?family=Anton&family=Poppins:ital,wght@0,300;0,400;0,500;0,600;0,700;0,800;1,600&display=swap';
-    var YT_SRC='https://www.youtube-nocookie.com/embed/7TtEFdMyRYw?rel=0&modestbranding=1&color=white';
 
     function loadFonts(){
       if(document.getElementById('gfonts'))return;
@@ -807,36 +830,39 @@
       var p2=document.createElement('link');p2.rel='preconnect';p2.href='https://fonts.gstatic.com';p2.crossOrigin='anonymous';document.head.appendChild(p2);
       var l=document.createElement('link');l.id='gfonts';l.rel='stylesheet';l.href=FONTS_URL;document.head.appendChild(l);
     }
-    function loadYT(){
-      var ph=document.getElementById('yt-placeholder');
-      if(!ph)return;
+    function loadYT(ph){
+      var src=ph.getAttribute('data-yt-src');
+      if(!src)return;
       var f=document.createElement('iframe');
-      f.className='video-frame';f.src=YT_SRC;f.title='Covernatixx – Live-Auftritt';
+      f.className='video-frame'+(ph.classList.contains('video-frame-vertical')?' video-frame-vertical':'');
+      f.src=src;f.title=ph.getAttribute('data-yt-title')||'YouTube Video';
       f.setAttribute('allow','accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture');
       f.setAttribute('allowfullscreen','');
       ph.replaceWith(f);
     }
+    function loadAllYT(){
+      document.querySelectorAll('.yt-placeholder').forEach(loadYT);
+    }
     window.cookieAccept=function(){
       localStorage.setItem('cnx_consent','yes');
       document.getElementById('cookie-banner').style.display='none';
-      loadFonts();loadYT();
+      loadFonts();loadAllYT();
     };
     window.cookieDecline=function(){
       localStorage.setItem('cnx_consent','no');
       document.getElementById('cookie-banner').style.display='none';
     };
     document.addEventListener('DOMContentLoaded',function(){
-      var ph=document.getElementById('yt-placeholder');
-      if(ph){
+      document.querySelectorAll('.yt-placeholder').forEach(function(ph){
         ph.addEventListener('click',function(){
-          if(localStorage.getItem('cnx_consent')==='yes'){loadYT();}
+          if(localStorage.getItem('cnx_consent')==='yes'){loadYT(ph);}
           else{document.getElementById('cookie-banner').style.display='flex';}
         });
         ph.addEventListener('keydown',function(e){if(e.key==='Enter'||e.key===' ')ph.click();});
-      }
+      });
       var c=localStorage.getItem('cnx_consent');
       if(!c){document.getElementById('cookie-banner').style.display='flex';}
-      else if(c==='yes'){loadFonts();loadYT();}
+      else if(c==='yes'){loadFonts();loadAllYT();}
     });
   })();
 </script>
